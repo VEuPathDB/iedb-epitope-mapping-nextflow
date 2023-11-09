@@ -7,6 +7,7 @@ process downloadSequences{
      path(url)
 
     output:
+     path()
 
     script:
      template 'downloadIedb.bash'
@@ -18,8 +19,7 @@ process downloadSequences{
 process processIedbEpitope {
 
     input:
-     path(xmlFile)
-     
+     path(xmlFile) 
 
     output:
      path("*fa")

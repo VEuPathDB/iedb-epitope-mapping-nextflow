@@ -4,6 +4,8 @@ set -euo pipefail
 
 file1=\$(cat ${url})
 
-curl -OJL   "\${file1}" -o iedb_export1
+mkdir iedb_export
 
-unzip 
+curl -JL  -o iedb_export.zip  "\${file1}" 
+
+unzip iedb_export.zip -d iedb_export
