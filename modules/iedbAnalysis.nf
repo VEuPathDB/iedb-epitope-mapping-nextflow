@@ -7,7 +7,7 @@ process downloadSequences{
      path(url)
 
     output:
-     path()
+     path('iedb_export/*'), emit: xmlFielPath
 
     script:
      template 'downloadIedb.bash'
@@ -20,7 +20,7 @@ process processIedbEpitope {
 
     input:
      path(xmlFile) 
-
+ 
     output:
      path("*fa")
 
@@ -36,5 +36,6 @@ workflow iedp {
 
     main:
     database = downloadSequences(url)
-    //downloadSequences = processIedbEpitope(xmlFile)
+    fileList = database.xmlFielPath.view()
+    processSequences = processIedbEpitope(database.fileList)
 }
