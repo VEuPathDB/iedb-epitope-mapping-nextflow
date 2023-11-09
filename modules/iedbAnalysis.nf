@@ -1,26 +1,40 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2 
 
-process downloadIedbEpitope {
-
+process downloadSequences{
+    
     input:
-    path weblink
+     path(url)
 
     output:
 
-    script: 
+    script:
+     template 'downloadIedb.bash'
 
-    """
-    wget ${weblink}
-    """
+
+}
+
+
+process processIedbEpitope {
+
+    input:
+     path(xmlFile)
+     
+
+    output:
+     path("*fa")
+
+    script: 
+     sample_base = xmlFile.getSimpleName()
+     template 'generateIedbPeptidefasta.bash' 
 }
 
 workflow iedp {
 
     take:
-    seq
+    url
 
     main:
-
-    downloadSequences = downloadIedbEpitope(seq)
+    database = downloadSequences(url)
+    //downloadSequences = processIedbEpitope(xmlFile)
 }
