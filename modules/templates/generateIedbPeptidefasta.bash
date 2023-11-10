@@ -4,4 +4,4 @@ set -euo pipefail
 
 sed -e s/"<References.*"/"<References>"/ $xmlFile > temp.xml
 
-processXmlFile.pl ./temp.xml ${sample_base}.fa
+processXmlFile.pl --inputXml ./temp.xml --output ${sample_base}.fa

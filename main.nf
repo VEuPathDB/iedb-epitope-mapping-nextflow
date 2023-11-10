@@ -4,16 +4,16 @@
 // include the RNA seq workflow
 //---------------------------------------
 
-include { iedp } from  './modules/iedbAnalysis.nf'
+include { iedbEpitopesDownload } from  './modules/iedbEpitopesDownload.nf'
 
 //======================================
 
-  if(!params.iedpUrl) {
+  if(!params.iedbUrl) {
     throw new Exception("Missing parameter params.iedpUrl")
   }
 
-url = Channel.fromPath(params.iedpUrl)
+url = Channel.fromPath(params.iedbUrl)
 
   workflow {
-    iedp(url)
+    iedbEpitopesDownload(url)
 }

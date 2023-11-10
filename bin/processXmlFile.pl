@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use XML::LibXML;
@@ -6,16 +6,18 @@ use Data::Dumper;
 use open qw(:std :utf8);
 use Getopt::Long;
 
+my ($xmlFile, $outFasta);
+&GetOptions("inputXml=s"=> \$xmlFile,
+            "output=s"=> \$outFasta,
+           ) ;
+die("Please provide both input and out put") unless ($xmlFile & $outFasta);
 
-my $filename = $ARGV[0];
-
-my $xml = XML::LibXML->load_xml(location => $filename);
+my $xml = XML::LibXML->load_xml(location => $xmlFile);
 
 
 my @epitopes = $xml->findnodes('/References/Reference/Epitopes/Epitope') ;
 
-my $outFile = $ARGV[1];
-open(FH, '>>', $outFile) or die $!;
+open(FH, '>>', $outFasta) or die $!;
 
 foreach my $epitope (@epitopes) {
   my ($EpitopeId, $epitopeName, $GenBankId, $SourceOrganismId, $LinearSequence);
