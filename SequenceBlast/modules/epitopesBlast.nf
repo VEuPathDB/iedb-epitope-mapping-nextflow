@@ -29,10 +29,6 @@ process blastSeq {
    script:
     template 'BlastSeq.sh'
 
-   //"""
-   // blastp -query ${query} -outfmt 6 -db ${db}/*fa -out Test.txt
-   //"""
-
 }
 
 workflow epitopesBlast {
