@@ -42,10 +42,7 @@ process mergeEpitopesFasta{
     output:
     path("*fa")
     script:
-
-    """
-    cat ${fasta} > iedbEpitpes.fa
-    """
+      template 'mergeFasta.bash'
 }
 
 

@@ -13,14 +13,7 @@ process makeBlastDatabase {
       path("BlastDB"), emit: db
     script:
        sample_base = fasta.getSimpleName()
-       """
-       mkdir BlastDB
-
-       cat ${fasta} > BlastDB/${sample_base}.fa
-
-       makeblastdb -in BlastDB/${sample_base}.fa   -title "Cookbook demo" -dbtype prot  
-       """
-
+       template 'makeBlastDb.bash'
 
 }
 
@@ -34,17 +27,22 @@ process blastSeq {
    output:
 
    script:
+    template 'BlastSeq.sh'
 
-   """
-    blastp -query ${query} -outfmt 6 -db ${db}/*fa -out Test.txt
-   """
+   //"""
+   // blastp -query ${query} -outfmt 6 -db ${db}/*fa -out Test.txt
+   //"""
 
 }
 
-workflow {
+workflow epitopesBlast {
+
+   take: 
+    querySeq
+
+    main:
 
    blastDb = makeBlastDatabase(params.fasta) 
-   //blastDb.db.view()
    blastResults = blastSeq(params.query, blastDb.db)
 
 }
