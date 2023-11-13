@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2 
 
 params.fasta = "$projectDir/data/query/query.fa"
-params.query = "$projectDir/Results/iedbFasta/iedbEpitpes.fa"
+//params.query = "$projectDir/Results/iedbFasta/iedbEpitpes.fa"
 
 process makeBlastDatabase {
 
@@ -38,7 +38,7 @@ workflow epitopesBlast {
 
     main:
 
-   blastDb = makeBlastDatabase(params.fasta) 
+   blastDb = makeBlastDatabase(querySeq) 
    blastResults = blastSeq(params.query, blastDb.db)
 
 }

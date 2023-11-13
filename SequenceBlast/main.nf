@@ -9,13 +9,13 @@ include { epitopesBlast } from  './modules/epitopesBlast.nf'
 //======================================
 
   if(!params.fasta) {
-    throw new Exception("Missing parameter params.iedpUrl")
+    throw new Exception("Missing parameter params.fasta")
   }
 
-fasta = Channel.fromPath(params.fasta)
+querySeq = Channel.fromPath(params.fasta)
 
   workflow { 
-    epitopesBlast(fasta)
+    epitopesBlast(querySeq)
 }
 
 
