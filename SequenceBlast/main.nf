@@ -12,10 +12,10 @@ include { epitopesBlast } from  './modules/epitopesBlast.nf'
     throw new Exception("Missing parameter params.fasta")
   }
 
-querySeq = Channel.fromPath(params.fasta)
+refFasta = Channel.fromPath(params.fasta)
 
   workflow { 
-    epitopesBlast(querySeq)
+    epitopesBlast(refFasta)
 }
 
 

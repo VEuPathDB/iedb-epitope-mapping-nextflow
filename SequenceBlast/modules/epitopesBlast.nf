@@ -34,11 +34,11 @@ process blastSeq {
 workflow epitopesBlast {
 
    take: 
-    querySeq
+    fasta
 
     main:
 
-   blastDb = makeBlastDatabase(querySeq) 
+   blastDb = makeBlastDatabase(fasta) 
    blastResults = blastSeq(params.query, blastDb.db)
 
 }
