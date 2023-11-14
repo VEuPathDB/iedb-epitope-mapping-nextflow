@@ -1,9 +1,6 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2 
 
-params.fasta = "$projectDir/data/query/query.fa"
-//params.query = "$projectDir/Results/iedbFasta/iedbEpitpes.fa"
-
 process makeBlastDatabase {
 
     input:
@@ -20,14 +17,18 @@ process makeBlastDatabase {
 
 process blastSeq {
 
+   publishDir "${params.results}/BlastOut", mode: 'copy'
+
    input:
     path(query)
     path(db)
 
    output:
+   path("${sample_base}*txt")
 
    script:
-    template 'BlastSeq.sh'
+    sample_base = query.getSimpleName()
+    template 'BlastSeq.bash'
 
 }
 
