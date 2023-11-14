@@ -1,1 +1,0 @@
-https://www.iedb.org/downloader.php?file_name=doc/iedb_export.zip
