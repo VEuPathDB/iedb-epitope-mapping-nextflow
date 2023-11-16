@@ -1,6 +1,18 @@
 #!/usr/bin/env nextflow
 nextflow.enable.dsl=2 
 
+
+process peptideSimilarity {
+    input:
+    path(refFasta)
+    path(pepfasta)
+    path(pepTab)
+
+    script:
+      template 'ProcessPeptides.bash'
+
+}
+
 process makeBlastDatabase {
 
     input:
@@ -35,11 +47,15 @@ process blastSeq {
 workflow epitopesBlast {
 
    take: 
-    fasta
+    refFasta
+    peptidesTab
+    peptidesGeneFasta
 
     main:
 
-   blastDb = makeBlastDatabase(fasta) 
-   blastResults = blastSeq(params.query, blastDb.db)
+    processPeptides = peptideSimilarity(refFasta, peptidesGeneFasta, peptidesTab)
+
+   //blastDb = makeBlastDatabase(fasta) 
+   //blastResults = blastSeq(params.query, blastDb.db)
 
 }
