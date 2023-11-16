@@ -3,10 +3,18 @@ nextflow.enable.dsl=2
 
 
 process peptideSimilarity {
+
+    publishDir "${params.results}", mode: 'copy'
+
+
     input:
     path(refFasta)
     path(pepfasta)
     path(pepTab)
+
+    output:
+    path("*Peptides.fasta"), emit: peptideFasta
+    path("*PeptideGene.txt"), emit: pepResults
 
     script:
       template 'ProcessPeptides.bash'
@@ -55,7 +63,7 @@ workflow epitopesBlast {
 
     processPeptides = peptideSimilarity(refFasta, peptidesGeneFasta, peptidesTab)
 
-   //blastDb = makeBlastDatabase(fasta) 
-   //blastResults = blastSeq(params.query, blastDb.db)
+    blastDb = makeBlastDatabase(refFasta) 
+    blastResults = blastSeq(processPeptides.peptideFasta, blastDb.db)
 
 }
