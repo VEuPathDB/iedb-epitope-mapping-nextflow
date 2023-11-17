@@ -38,8 +38,7 @@ def main(argv):
         protein = peptidesProperties[0]
         peptideId = peptidesProperties[1]
         peptide = peptidesProperties[3]
-        peptideName = peptidesProperties[4]
-        print(">", protein, "_", peptideId, sep="",file=fastaOut)
+        print(">", peptideId, sep="",file=fastaOut)
         print(peptide, file=fastaOut)
 
         if protein in peptideDic:
@@ -48,19 +47,19 @@ def main(argv):
             peptideDic[protein] = [peptide]
 
         if peptide in peptideNames:
-            peptideNames[peptide] = peptideName
+            peptideNames[peptide] = peptideId
         else:
-            peptideNames[peptide] = peptideName
+            peptideNames[peptide] = peptideId
 
     for refSeq in SeqIO.parse(refProteome, "fasta"):
         for pepSeq in SeqIO.parse(epitopeProtein, "fasta"):
             peptideList = peptideDic.get(pepSeq.id)
             for pep in peptideList:
-                pepName = peptideNames.get(pep)
+                pepID = peptideNames.get(pep)
                 if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
-                    print(refSeq.id,"\t" ,"Exact match","\t", pep, "\t", pepName, file=outPut)
+                    print(refSeq.id,"\t" ,"Peptide and gene match","\t", pep, "\t", pepID, file=outPut)
                 elif pep in refSeq.seq:
-                   print(refSeq.id, "\t",  "Has a peptide in gene", "\t", pep, "\t", pepName, file=outPut)
+                   print(refSeq.id, "\t",  "Peptide from a different gene matches", "\t", pep, "\t", pepID, file=outPut)
 
             # if refSeq.seq == pepSeq.seq: 
             #     peptideList = peptideDic.get(pepSeq.id)
