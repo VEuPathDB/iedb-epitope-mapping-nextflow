@@ -9,7 +9,7 @@ def main(argv):
     epitopetab = ''
     outfile = 'PeptideGene.txt'
     outfasta = 'Peptides.fasta'
-    
+
     try:
         opts, args = getopt.getopt(argv,"hr:e:l:",["refProteome=","epitopeProtein=","epitopetab="])
     except getopt.GetoptError:
@@ -31,35 +31,54 @@ def main(argv):
     peptideTab = open(epitopetab)
 
     peptideDic = {}
-    for line in peptideTab:
-        peptidesProperties = line.split()
+    peptideNames = {}
+    for lines in peptideTab:
+        line = lines.strip()
+        peptidesProperties = line.split("\t")
         protein = peptidesProperties[0]
         peptideId = peptidesProperties[1]
         peptide = peptidesProperties[3]
+        peptideName = peptidesProperties[4]
         print(">", protein, "_", peptideId, sep="",file=fastaOut)
         print(peptide, file=fastaOut)
 
         if protein in peptideDic:
             peptideDic[protein].append(peptide)
         else:
-            peptideDic[protein] = [peptide]    
+            peptideDic[protein] = [peptide]
+
+        if peptide in peptideNames:
+            peptideNames[peptide] = peptideName
+        else:
+            peptideNames[peptide] = peptideName
 
     for refSeq in SeqIO.parse(refProteome, "fasta"):
         for pepSeq in SeqIO.parse(epitopeProtein, "fasta"):
-            if refSeq.seq == pepSeq.seq: 
-                peptideList = peptideDic.get(pepSeq.id)
-                for pep in peptideList:
-                    if pep in refSeq.seq:
-                        print(refSeq.id,"\t" ,"Exact match","\t", pep, file=outPut)
-                    else:
-                        print(refSeq.id, "\t", "Not exact match", "\t", pep, file=outPut)
+            peptideList = peptideDic.get(pepSeq.id)
+            for pep in peptideList:
+                pepName = peptideNames.get(pep)
+                if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
+                    print(refSeq.id,"\t" ,"Exact match","\t", pep, "\t", pepName, file=outPut)
+                elif pep in refSeq.seq:
+                   print(refSeq.id, "\t",  "Has a peptide in gene", "\t", pep, "\t", pepName, file=outPut)
 
-        else:
-            for key in peptideDic:
-                pepList = peptideDic[key]
-                for pep in pepList:
-                    if pep in refSeq.seq:
-                        print(refSeq.id, "\t",  "Has a peptide in gene", "\t", pep, file=outPut)
+            # if refSeq.seq == pepSeq.seq: 
+            #     peptideList = peptideDic.get(pepSeq.id)
+            #     for pep in peptideList:
+            #         pepName = peptideNames.get(pep)
+            #         if pep in refSeq.seq:
+            #             print(refSeq.id,"\t" ,"Exact match","\t", pep, "\t", pepName, file=outPut)
+            #         else:
+            #             print(refSeq.id, "\t", "Not exact match", "\t", pep, "\t", pepName, file=outPut)
+            
+
+            # else:
+            #     for key in peptideDic:
+            #         pepList = peptideDic[key]
+            #         for pep in pepList:
+            #             pepName = peptideNames.get(pep)
+            #             if pep in refSeq.seq and refSeq.seq != pepSeq.seq:
+            #                 print(refSeq.id, "\t",  "Has a peptide in gene", "\t", pep, "\t", pepName, file=outPut)
 
     outPut.close()
     fastaOut.close()

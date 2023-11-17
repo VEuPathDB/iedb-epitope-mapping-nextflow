@@ -63,7 +63,7 @@ workflow epitopesBlast {
 
     processPeptides = peptideSimilarity(refFasta, peptidesGeneFasta, peptidesTab)
 
-    blastDb = makeBlastDatabase(refFasta) 
-    blastResults = blastSeq(processPeptides.peptideFasta, blastDb.db)
+    blastDb = makeBlastDatabase(processPeptides.peptideFasta) 
+    blastResults = blastSeq(refFasta, blastDb.db)
 
 }
