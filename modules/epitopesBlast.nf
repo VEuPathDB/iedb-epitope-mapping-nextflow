@@ -52,6 +52,38 @@ process blastSeq {
 
 }
 
+process diamondDatabase {
+
+    input:
+    path(fasta)
+
+    output:
+    path("*dmnd"), emit: db
+
+    script:
+    sample_base = fasta.getSimpleName()
+    template 'makeDiamondDb.bash'
+    
+}
+
+process diamondBlast {
+
+    publishDir "${params.results}/BlastOut", mode: 'copy'
+
+    input:
+    path(query)
+    path(db)
+
+    output:
+    path("*txt")
+
+    script:
+    sample_base = query.getSimpleName()
+    template 'diamondBlast.bash'
+    
+
+}
+
 workflow epitopesBlast {
 
    take: 
@@ -63,7 +95,14 @@ workflow epitopesBlast {
 
     processPeptides = peptideSimilarity(refFasta, peptidesGeneFasta, peptidesTab)
 
-    blastDb = makeBlastDatabase(processPeptides.peptideFasta) 
-    blastResults = blastSeq(refFasta, blastDb.db)
+    if (params.blastMethod == "ncbiBlast") {
+      blastDb = makeBlastDatabase(processPeptides.peptideFasta) 
+      blastResults = blastSeq(refFasta, blastDb.db)
+    
+    } else if (params.blastMethod == "diamond") {
+
+      diamondDb = diamondDatabase(processPeptides.peptideFasta) 
+      diamondResults = diamondBlast(refFasta, diamondDb.db)
+    }
 
 }
