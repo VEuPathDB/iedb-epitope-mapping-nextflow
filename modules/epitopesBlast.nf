@@ -96,13 +96,13 @@ workflow epitopesBlast {
     processPeptides = peptideSimilarity(refFasta, peptidesGeneFasta, peptidesTab)
 
     if (params.blastMethod == "ncbiBlast") {
-      blastDb = makeBlastDatabase(processPeptides.peptideFasta) 
-      blastResults = blastSeq(refFasta, blastDb.db)
+      database = makeBlastDatabase(processPeptides.peptideFasta) 
+      blastResults = blastSeq(refFasta, database.db)
     
     } else if (params.blastMethod == "diamond") {
 
-      diamondDb = diamondDatabase(processPeptides.peptideFasta) 
-      diamondResults = diamondBlast(refFasta, diamondDb.db)
+      database = diamondDatabase(processPeptides.peptideFasta) 
+      blastResults = diamondBlast(refFasta, database.db)
     }
 
 }
