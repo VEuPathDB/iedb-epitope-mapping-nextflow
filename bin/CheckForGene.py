@@ -57,9 +57,9 @@ def main(argv):
             for pep in peptideList:
                 pepID = peptideNames.get(pep)
                 if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
-                    print(refSeq.id,"\t" ,"Exact peptide match","\t" ,"Whole protein match","\t", pep, "\t", pepID, file=outPut)
+                    print(refSeq.id,"\t" ,"Exact peptide match","\t" ,"Whole protein match","\t", pep, "\t", pepID, file=outPut, sep="")
                 elif pep in refSeq.seq:
-                   print(refSeq.id, "\t", "Exact peptide match","\t" ,"Not whole protein do not match", "\t", pep, "\t", pepID, file=outPut)
+                   print(refSeq.id, "\t", "Exact peptide match","\t" ,"Not whole protein do not match", "\t", pep, "\t", pepID, file=outPut, sep="")
 
             # if refSeq.seq == pepSeq.seq: 
             #     peptideList = peptideDic.get(pepSeq.id)
