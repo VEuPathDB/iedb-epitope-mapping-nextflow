@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 from Bio import SeqIO
-import sys, getopt
+import sys, getopt, re
 
 def main(argv):
     refProteome = ''
@@ -57,9 +57,15 @@ def main(argv):
             for pep in peptideList:
                 pepID = peptideNames.get(pep)
                 if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
-                    print(refSeq.id,"\t" ,"Peptide and protein match","\t", pep, "\t", pepID,  "\t", pepSeq.id, file=outPut, sep="")
-                elif pep in refSeq.seq:
-                   print(refSeq.id, "\t", "Only peptide match", "\t", pep, "\t", pepID, "\t", pepSeq.id, file=outPut, sep="")
+                    match=(re.search(str(pep), str(refSeq.seq)))
+                    matchStart = match.start() + 1
+                    matchEnd = match.end()
+                    print(refSeq.id,"\t" ,"Peptide and protein match","\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, file=outPut, sep="")
+                elif refSeq.seq != pepSeq.seq and pep in refSeq.seq:
+                    match=(re.search(str(pep), str(refSeq.seq)))
+                    matchStart = match.start() + 1
+                    matchEnd = match.end()
+                    print(refSeq.id, "\t", "Only peptide match", "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, file=outPut, sep="")
 
     outPut.close()
     fastaOut.close()
