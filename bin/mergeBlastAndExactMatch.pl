@@ -11,9 +11,9 @@ my ($exactMatch, $blast);
            ) ;
 die("Please provide both input and out put") unless ($exactMatch & $blast);
 
-my $peptideMatchFile = $exactMatch; # $ARGV[0]; #"/Users/saikouybah/Library/CloudStorage/OneDrive-UniversityofGlasgow/Documents/IedbAnalysis/Result/PeptideGene.txt";
+my $peptideMatchFile = $exactMatch;
 
-my $blastFile = $blast; # $ARGV[1]; #"/Users/saikouybah/Library/CloudStorage/OneDrive-UniversityofGlasgow/Documents/IedbAnalysis/Result/BlastOut/AnnotatedProteins.txt";
+my $blastFile = $blast;
 
 my $outFile = "./EpitopesSearchResults.txt";
 
@@ -24,7 +24,7 @@ sub loadEpitopeps{
     my %peptideHash = ();
     while (my $row = <$pepHandle>) {
         chomp $row;
-        my @counts_list = split("\t", $row); #split /\s+/,$row;
+        my @counts_list = split("\t", $row);
         my $proteinID = $counts_list[0];
         my $peptideID = $counts_list[3];
         my $matchType = $counts_list[1];
@@ -84,7 +84,6 @@ sub loadEpitopeps{
         }
 
     }
-    # print Dumper {%peptideHash}
 
     foreach my $key (keys %peptideHash) {
         my @currentList = ();
