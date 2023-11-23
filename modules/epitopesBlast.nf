@@ -101,6 +101,8 @@ process processXml {
 
 process mergeeResultsFiles {
 
+  publishDir "${params.results}/BlastOut", mode: 'copy'
+
   input:
     path(exactMatch)
     path(balst)
@@ -138,6 +140,6 @@ workflow epitopesBlast {
 
     processResults = processXml(blastResults.result)
 
-    //mergeFiles = mergeeResultsFiles(processPeptides.pepResults, blastResults.result)
+    mergeFiles = mergeeResultsFiles(processPeptides.pepResults, processResults.resultFormated)
 
 }

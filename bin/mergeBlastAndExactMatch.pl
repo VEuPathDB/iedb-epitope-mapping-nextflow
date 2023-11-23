@@ -28,6 +28,7 @@ sub loadEpitopeps{
         my $proteinID = $counts_list[0];
         my $peptideID = $counts_list[3];
         my $matchType = $counts_list[1];
+        my $alignment = $counts_list[2];
         my $matchStart = $counts_list[5];
         my $matchEnd = $counts_list[6];
         my $key = $proteinID . "_" . $peptideID;
@@ -36,6 +37,7 @@ sub loadEpitopeps{
         $peptideHash{$key}{MatchType} = $matchType;
         $peptideHash{$key}{matchStart} = $matchStart;
         $peptideHash{$key}{matchEnd} = $matchEnd;
+        $peptideHash{$key}{alignment} = $alignment;
 
     }
 
@@ -46,23 +48,38 @@ sub loadEpitopeps{
         my @counts_list = split("\t", $row);
         my $proteinID = $counts_list[0];
         my $peptideID = $counts_list[1];
-        my $PercentageIdentity = $counts_list[2];
-        my $alignmentLength = $counts_list[3];
-        my $matchStart = $counts_list[6];
-        my $matchEnd = $counts_list[7];
+        my $pepLen = $counts_list[2];
+        my $bitScore = $counts_list[3];
+        my $matchStart = $counts_list[4];
+        my $matchEnd = $counts_list[5];
+        my $indetity = $counts_list[6];
+        my $alignmentLength = $counts_list[7];
+        my $refSeq = $counts_list[8];
+        my $hitSeq = $counts_list[9];
+        my $alignment = $counts_list[9];
+       
         
         my $key = $proteinID . "_" . $peptideID;
 
         if (exists($peptideHash{$key})){
-            $peptideHash{$key}{blastIdentity} = $PercentageIdentity;
-            $peptideHash{$key}{alignmentLenght} = $alignmentLength;
+            $peptideHash{$key}{pepLen} = $pepLen;
+            $peptideHash{$key}{bitScore} = $bitScore;
+            $peptideHash{$key}{indetity} = $indetity;
+            $peptideHash{$key}{alignmentLength} = $alignmentLength;
+            $peptideHash{$key}{refSeq} = $refSeq;
+            $peptideHash{$key}{hitSeq} = $hitSeq;
         } else {
             $peptideHash{$key}{protein} = $proteinID;
             $peptideHash{$key}{peptide} = $peptideID;
-            $peptideHash{$key}{blastIdentity} = $PercentageIdentity;
-            $peptideHash{$key}{alignmentLenght} = $alignmentLength;
+            $peptideHash{$key}{pepLen} = $pepLen;
+            $peptideHash{$key}{bitScore} = $bitScore;
+            $peptideHash{$key}{indetity} = $indetity;
             $peptideHash{$key}{matchStart} = $matchStart;
             $peptideHash{$key}{matchEnd} = $matchEnd;
+            $peptideHash{$key}{alignmentLength} = $alignmentLength;
+            $peptideHash{$key}{refSeq} = $refSeq;
+            $peptideHash{$key}{hitSeq} = $hitSeq;
+            $peptideHash{$key}{alignment} = $alignment;
 
         }
 
@@ -82,11 +99,22 @@ sub loadEpitopeps{
         } else {
             push @currentList, " ";
         }
-        if (exists($peptideHash{$key}{MatchType})){
-            push @currentList, $peptideHash{$key}{MatchType};
+        if (exists($peptideHash{$key}{pepLen})){
+            push @currentList, $peptideHash{$key}{pepLen};
         } else {
             push @currentList, " ";
         }
+        if (exists($peptideHash{$key}{bitScore})){
+            push @currentList, $peptideHash{$key}{bitScore};
+        } else {
+            push @currentList, " ";
+        }
+        if (exists($peptideHash{$key}{indetity})){
+            push @currentList, $peptideHash{$key}{indetity};
+        } else {
+            push @currentList, " ";
+        }
+        
         if (exists($peptideHash{$key}{matchStart})){
             push @currentList, $peptideHash{$key}{matchStart};
         } else {
@@ -97,18 +125,40 @@ sub loadEpitopeps{
         } else {
             push @currentList, " ";
         }
-        if (exists($peptideHash{$key}{blastIdentity})){
-            push @currentList, $peptideHash{$key}{blastIdentity};
+        if (exists($peptideHash{$key}{alignmentLength})){
+            push @currentList, $peptideHash{$key}{alignmentLength};
         } else {
             push @currentList, " ";
         }
-        if (exists($peptideHash{$key}{alignmentLenght})){
-            push @currentList, $peptideHash{$key}{alignmentLenght};
+         if (exists($peptideHash{$key}{bitScore})){
+            push @currentList, $peptideHash{$key}{bitScore};
         } else {
             push @currentList, " ";
         }
+        if (exists($peptideHash{$key}{refSeq})){
+            push @currentList, $peptideHash{$key}{refSeq};
+        } else {
+            push @currentList, " ";
+        }
+        if (exists($peptideHash{$key}{hitSeq})){
+            push @currentList, $peptideHash{$key}{hitSeq};
+        } else {
+            push @currentList, " ";
+        }
+        if (exists($peptideHash{$key}{alignment})){
+            push @currentList, $peptideHash{$key}{alignment};
+        } else {
+            push @currentList, " ";
+        }
+        if (exists($peptideHash{$key}{MatchType})){
+            push @currentList, $peptideHash{$key}{MatchType};
+        } else {
+            push @currentList, " ";
+        }
+        
 
-        print FH ($currentList[0], "\t", $currentList[1],  "\t", $currentList[3], "\t", $currentList[4], "\t", $currentList[5], "\t", $currentList[6], "\t", $currentList[2],"\n")
+        print FH ($currentList[0], "\t", $currentList[1],  "\t", $currentList[2], "\t", $currentList[3],  "\t", $currentList[4], "\t", $currentList[5], "\t", $currentList[6], "\t", 
+        , $currentList[7], "\t", $currentList[8],"\t" , $currentList[9], "\t", $currentList[10], "\t", $currentList[11], "\t", $currentList[12], "\n")
     }
 }
 
