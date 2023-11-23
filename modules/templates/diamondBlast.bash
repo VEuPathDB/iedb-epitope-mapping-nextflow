@@ -2,4 +2,4 @@
 
 set -euo pipefail
 
-diamond blastp -q ${query} -d ${db} -o ${sample_base}.txt
+diamond blastp -q ${query} -d ${db} -f 5 -o ${sample_base}.xml

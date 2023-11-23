@@ -8,13 +8,13 @@ process peptideSimilarity {
 
 
     input:
-    path(refFasta)
-    path(pepfasta)
-    path(pepTab)
+      path(refFasta)
+      path(pepfasta)
+      path(pepTab)
 
     output:
-    path("*Peptides.fasta"), emit: peptideFasta
-    path("*PeptideGene.txt"), emit: pepResults
+      path("*Peptides.fasta"), emit: peptideFasta
+      path("*PeptideGene.txt"), emit: pepResults
 
     script:
       template 'ProcessPeptides.bash'
@@ -37,32 +37,32 @@ process makeBlastDatabase {
 
 process blastSeq {
 
-   publishDir "${params.results}/BlastOut", mode: 'copy'
+    publishDir "${params.results}/BlastOut", mode: 'copy'
 
-   input:
-    path(query)
-    path(db)
+    input:
+      path(query)
+      path(db)
 
-   output:
-   path("${sample_base}*txt")
+    output:
+      path("${sample_base}*xml"), emit: result
 
-   script:
-    sample_base = query.getSimpleName()
-    template 'BlastSeq.bash'
+    script:
+      sample_base = query.getSimpleName()
+      template 'BlastSeq.bash'
 
 }
 
 process diamondDatabase {
 
     input:
-    path(fasta)
+      path(fasta)
 
     output:
-    path("*dmnd"), emit: db
+      path("*dmnd"), emit: db
 
     script:
-    sample_base = fasta.getSimpleName()
-    template 'makeDiamondDb.bash'
+      sample_base = fasta.getSimpleName()
+      template 'makeDiamondDb.bash'
     
 }
 
@@ -71,16 +71,47 @@ process diamondBlast {
     publishDir "${params.results}/BlastOut", mode: 'copy'
 
     input:
-    path(query)
-    path(db)
+      path(query)
+      path(db)
 
     output:
-    path("*txt")
+      path("*xml"), emit: result
 
     script:
-    sample_base = query.getSimpleName()
-    template 'diamondBlast.bash'
+      sample_base = query.getSimpleName()
+      template 'diamondBlast.bash'
+
+}   
+
+process processXml {
+
+    publishDir "${params.results}/BlastOut", mode: 'copy'
+
+    input:
+      path(xml)
+
+    output:
+      path("*txt"), emit: resultFormated
+
+
+    script:
+      template 'processBlastXml.bash'
+}
+
+
+process mergeeResultsFiles {
+
+  input:
+    path(exactMatch)
+    path(balst)
     
+  
+
+  output:
+    path("*txt")
+
+  script:
+    template 'mergeFiles.bash'
 
 }
 
@@ -104,5 +135,9 @@ workflow epitopesBlast {
       database = diamondDatabase(processPeptides.peptideFasta) 
       blastResults = diamondBlast(refFasta, database.db)
     }
+
+    processResults = processXml(blastResults.result)
+
+    //mergeFiles = mergeeResultsFiles(processPeptides.pepResults, blastResults.result)
 
 }
