@@ -4,6 +4,8 @@ nextflow.enable.dsl=2
 
 process peptideSimilarity {
 
+    container = 'eptope'
+
     publishDir "${params.results}", mode: 'copy'
 
 
@@ -23,6 +25,8 @@ process peptideSimilarity {
 
 process makeBlastDatabase {
 
+     container = 'veupathdb/blastsimilarity'
+
     input:
       path(fasta)
 
@@ -36,6 +40,8 @@ process makeBlastDatabase {
 
 
 process blastSeq {
+
+    container = 'veupathdb/blastsimilarity'
 
     publishDir "${params.results}/BlastOut", mode: 'copy'
 
@@ -54,6 +60,8 @@ process blastSeq {
 
 process diamondDatabase {
 
+    container = 'veupathdb/diamond'
+
     input:
       path(fasta)
 
@@ -67,6 +75,8 @@ process diamondDatabase {
 }
 
 process diamondBlast {
+
+    container = 'veupathdb/diamond'
 
     publishDir "${params.results}/BlastOut", mode: 'copy'
 
@@ -85,6 +95,8 @@ process diamondBlast {
 
 process processXml {
 
+     container = 'eptope'
+
     publishDir "${params.results}/BlastOut", mode: 'copy'
 
     input:
@@ -101,19 +113,21 @@ process processXml {
 
 process mergeeResultsFiles {
 
-  publishDir "${params.results}/BlastOut", mode: 'copy'
+    container = 'eptope'
 
-  input:
-    path(exactMatch)
-    path(balst)
+    publishDir "${params.results}/BlastOut", mode: 'copy'
+
+    input:
+      path(exactMatch)
+      path(balst)
     
   
 
-  output:
-    path("*txt")
+    output:
+      path("*txt")
 
-  script:
-    template 'mergeFiles.bash'
+    script:
+      template 'mergeFiles.bash'
 
 }
 
