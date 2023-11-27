@@ -129,11 +129,6 @@ sub loadEpitopeps{
         } else {
             push @currentList, " ";
         }
-        #  if (exists($peptideHash{$key}{bitScore})){
-        #     push @currentList, $peptideHash{$key}{bitScore};
-        # } else {
-        #     push @currentList, " ";
-        # }
         if (exists($peptideHash{$key}{refSeq})){
             push @currentList, $peptideHash{$key}{refSeq};
         } else {
