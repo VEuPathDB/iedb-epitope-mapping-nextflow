@@ -56,7 +56,7 @@ sub loadEpitopeps{
         my $alignmentLength = $counts_list[7];
         my $refSeq = $counts_list[8];
         my $hitSeq = $counts_list[9];
-        my $alignment = $counts_list[9];
+        my $alignment = $counts_list[10];
        
         
         my $key = $proteinID . "_" . $peptideID;
@@ -129,11 +129,11 @@ sub loadEpitopeps{
         } else {
             push @currentList, " ";
         }
-         if (exists($peptideHash{$key}{bitScore})){
-            push @currentList, $peptideHash{$key}{bitScore};
-        } else {
-            push @currentList, " ";
-        }
+        #  if (exists($peptideHash{$key}{bitScore})){
+        #     push @currentList, $peptideHash{$key}{bitScore};
+        # } else {
+        #     push @currentList, " ";
+        # }
         if (exists($peptideHash{$key}{refSeq})){
             push @currentList, $peptideHash{$key}{refSeq};
         } else {
@@ -157,7 +157,7 @@ sub loadEpitopeps{
         
 
         print FH ($currentList[0], "\t", $currentList[1],  "\t", $currentList[2], "\t", $currentList[3],  "\t", $currentList[4], "\t", $currentList[5], "\t", $currentList[6], "\t", 
-        , $currentList[7], "\t", $currentList[8],"\t" , $currentList[9], "\t", $currentList[10], "\t", $currentList[11], "\t", $currentList[12], "\n")
+        , $currentList[7], "\t", $currentList[8],"\t" , $currentList[9], "\t", $currentList[10], "\t", $currentList[11],  "\n")
     }
 }
 
