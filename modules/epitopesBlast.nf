@@ -4,7 +4,7 @@ nextflow.enable.dsl=2
 
 process peptideSimilarity {
 
-    container = 'iedbepitopeanalysis'
+    container = 'veupathdb/epitopemapping'
 
     publishDir "${params.results}", mode: 'copy'
 
@@ -96,7 +96,7 @@ process diamondBlast {
 
 process processXml {
 
-     container = 'iedbepitopeanalysis'
+     container = 'veupathdb/epitopemapping'
 
     publishDir "${params.results}/BlastOut", mode: 'copy'
 
@@ -114,7 +114,7 @@ process processXml {
 
 process mergeeResultsFiles {
 
-    container = 'iedbepitopeanalysis'
+    container = 'veupathdb/epitopemapping'
 
     publishDir "${params.results}/BlastOut", mode: 'copy'
 
