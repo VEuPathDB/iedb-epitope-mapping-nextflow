@@ -4,7 +4,7 @@ nextflow.enable.dsl=2
 
 process peptideSimilarity {
 
-    container = 'eptope'
+    container = 'iedbepitopeanalysis'
 
     publishDir "${params.results}", mode: 'copy'
 
@@ -96,7 +96,7 @@ process diamondBlast {
 
 process processXml {
 
-     container = 'eptope'
+     container = 'iedbepitopeanalysis'
 
     publishDir "${params.results}/BlastOut", mode: 'copy'
 
@@ -114,7 +114,7 @@ process processXml {
 
 process mergeeResultsFiles {
 
-    container = 'eptope'
+    container = 'iedbepitopeanalysis'
 
     publishDir "${params.results}/BlastOut", mode: 'copy'
 
