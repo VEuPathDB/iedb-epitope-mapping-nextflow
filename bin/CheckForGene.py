@@ -9,37 +9,43 @@ def main(argv):
     epitopetab = ''
     outfile = 'PeptideGene.txt'
     outfasta = 'Peptides.fasta'
+    refTaxa = 0
 
     try:
-        opts, args = getopt.getopt(argv,"hr:e:l:",["refProteome=","epitopeProtein=","epitopetab="])
+        opts, args = getopt.getopt(argv,"hr:e:l:t:",["refProteome=","epitopeProtein=","epitopetab=", "refTaxa"])
     except getopt.GetoptError:
-        print ('CheckForGene.py -r <refProeteom> -e <refProeteom> -l <epitopetab>')   
+        print ('CheckForGene.py -r <refProeteom> -e <refProeteom> -l <epitopetab> -t <epitopetab>')   
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print ('CheckForGene.py -r <refProeteom> -e <refProeteom> -l <epitopetab>')
+            print ('CheckForGene.py -r <refProeteom> -e <refProeteom> -l <epitopetab> -t <epitopetab>')
             sys.exit()
         elif opt in ("-r", "--refProteome"):
-         refProteome = arg
+            refProteome = arg
         elif opt in ("-e", "--epitopeProtein"):
             epitopeProtein = arg
         elif opt in ("-l", "--epitopetab"):
             epitopetab = arg
+        elif opt in ("-t", "--refTaxa"):
+            refTaxa = arg
    
     outPut = open(outfile, 'w')
     fastaOut = open(outfasta, 'w')
     peptideTab = open(epitopetab)
-
+    referenceTaxa = refTaxa
     peptideDic = {}
     peptideNames = {}
+    peptideTaxa = {}
     for lines in peptideTab:
         line = lines.strip()
         peptidesProperties = line.split("\t")
         protein = peptidesProperties[0]
         peptideId = peptidesProperties[1]
+        taxa = peptidesProperties[2]
         peptide = peptidesProperties[3]
-        print(">", peptideId, sep="",file=fastaOut)
-        print(peptide, file=fastaOut)
+        if int(referenceTaxa) == int(taxa):
+            print(">", peptideId, sep="",file=fastaOut)
+            print(peptide, file=fastaOut)
 
         if protein in peptideDic:
             peptideDic[protein].append(peptide)
@@ -50,25 +56,45 @@ def main(argv):
             peptideNames[peptide] = peptideId
         else:
             peptideNames[peptide] = peptideId
+        
+        if peptide in peptideTaxa:
+            peptideTaxa[peptide] = taxa
+        else:
+            peptideTaxa[peptide] = taxa
 
     for refSeq in SeqIO.parse(refProteome, "fasta"):
         for pepSeq in SeqIO.parse(epitopeProtein, "fasta"):
             peptideList = peptideDic.get(pepSeq.id)
+           
             for pep in peptideList:
                 pepID = peptideNames.get(pep)
-                if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
-                    match=(re.search(str(pep), str(refSeq.seq)))
-                    matchStart = match.start() + 1
-                    matchEnd = match.end()
-                    print(refSeq.id,"\t" ,"Peptide and protein match","\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, file=outPut, sep="")
-                elif refSeq.seq != pepSeq.seq and pep in refSeq.seq:
-                    match=(re.search(str(pep), str(refSeq.seq)))
-                    matchStart = match.start() + 1
-                    matchEnd = match.end()
-                    print(refSeq.id, "\t", "Only peptide match", "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, file=outPut, sep="")
-
+                taxa = peptideTaxa.get(pep)
+                if int(taxa) == int(referenceTaxa):
+                    if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
+                        match=(re.search(str(pep), str(refSeq.seq)))
+                        matchStart = match.start() + 1
+                        matchEnd = match.end()
+                        print(refSeq.id,"\t" ,"Peptide and protein match; same strain","\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
+                    elif refSeq.seq != pepSeq.seq and pep in refSeq.seq:
+                        match=(re.search(str(pep), str(refSeq.seq)))
+                        matchStart = match.start() + 1
+                        matchEnd = match.end()
+                        print(refSeq.id, "\t", "Only peptide match; same strain", "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
+                else:
+                    if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
+                        match=(re.search(str(pep), str(refSeq.seq)))
+                        matchStart = match.start() + 1
+                        matchEnd = match.end()
+                        print(refSeq.id,"\t" ,"Peptide and protein match; different strain","\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
+                    elif refSeq.seq != pepSeq.seq and pep in refSeq.seq:
+                        match=(re.search(str(pep), str(refSeq.seq)))
+                        matchStart = match.start() + 1
+                        matchEnd = match.end()
+                        print(refSeq.id, "\t", "Only peptide match; different strain", "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
+        
     outPut.close()
     fastaOut.close()
+    peptideTab.close()
 
 if __name__ == "__main__":
    main(sys.argv[1:])
