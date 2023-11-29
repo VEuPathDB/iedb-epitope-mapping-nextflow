@@ -74,23 +74,23 @@ def main(argv):
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id,"\t" ,"Peptide and protein match; same strain","\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
+                        print(refSeq.id,"\t" ,"Peptide and protein match; same strain","\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, file=outPut, sep="")
                     elif refSeq.seq != pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id, "\t", "Only peptide match; same strain", "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
+                        print(refSeq.id, "\t", "Only peptide match; same strain", "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, file=outPut, sep="")
                 else:
                     if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id,"\t" ,"Peptide and protein match; different strain","\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
+                        print(refSeq.id,"\t" ,"Peptide and protein match; different strain","\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, file=outPut, sep="")
                     elif refSeq.seq != pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id, "\t", "Only peptide match; different strain", "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
+                        print(refSeq.id, "\t", "Only peptide match; different strain", "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, file=outPut, sep="")
         
     outPut.close()
     fastaOut.close()

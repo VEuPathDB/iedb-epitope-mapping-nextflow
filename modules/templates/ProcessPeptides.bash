@@ -2,4 +2,4 @@
 
 set -euo pipefail
 
-CheckForGene.py -r ${refFasta} -l ${pepTab}  -e ${pepfasta}
+CheckForGene.py -r ${refFasta} -l ${pepTab}  -e ${pepfasta} -t ${taxa}

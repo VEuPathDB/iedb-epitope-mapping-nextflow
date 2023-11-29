@@ -13,6 +13,7 @@ process peptideSimilarity {
       path(refFasta)
       path(pepfasta)
       path(pepTab)
+      val(taxa)
 
     output:
       path("*Peptides.fasta"), emit: peptideFasta
@@ -140,7 +141,7 @@ workflow epitopesBlast {
 
     main:
 
-    processPeptides = peptideSimilarity(refFasta, peptidesGeneFasta, peptidesTab)
+    processPeptides = peptideSimilarity(refFasta, peptidesGeneFasta, peptidesTab, params.taxon)
 
     if (params.blastMethod == "ncbiBlast") {
       database = makeBlastDatabase(processPeptides.peptideFasta) 
