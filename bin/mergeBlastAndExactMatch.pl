@@ -17,7 +17,7 @@ my $blastFile = $blast;
 
 my $outFile = "./EpitopesSearchResults.txt";
 
-sub loadEpitopeps{
+sub processEpitopeps{
     open(my $pepHandle, $peptideMatchFile) or die "Could not open file '$peptideMatchFile' $!";
     open(FH ,'>' ,$outFile) or die $!;
 
@@ -156,4 +156,4 @@ sub loadEpitopeps{
     }
 }
 
-loadEpitopeps()
+processEpitopeps()
