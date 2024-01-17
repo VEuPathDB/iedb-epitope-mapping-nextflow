@@ -4,7 +4,8 @@ nextflow.enable.dsl=2
 
 process peptideSimilarity {
 
-    container = 'veupathdb/epitopemapping'
+    //container = 'veupathdb/epitopemapping'
+    container = 'epitopemapping'
 
     publishDir "${params.results}", mode: 'copy'
 
@@ -26,7 +27,8 @@ process peptideSimilarity {
 
 process makeBlastDatabase {
 
-     container = 'veupathdb/blastsimilarity'
+     //container = 'veupathdb/blastsimilarity'
+     container = 'epitopemapping'
 
     input:
       path(fasta)
@@ -42,7 +44,8 @@ process makeBlastDatabase {
 
 process blastSeq {
 
-    container = 'veupathdb/blastsimilarity'
+    //container = 'veupathdb/blastsimilarity'
+    container = 'epitopemapping'
 
     publishDir "${params.results}/BlastOut", mode: 'copy'
 
@@ -96,7 +99,8 @@ process diamondBlast {
 
 process processXml {
 
-     container = 'veupathdb/epitopemapping'
+     //container = 'veupathdb/epitopemapping'
+     container = 'epitopemapping'
 
     publishDir "${params.results}/BlastOut", mode: 'copy'
 
@@ -114,7 +118,8 @@ process processXml {
 
 process mergeeResultsFiles {
 
-    container = 'veupathdb/epitopemapping'
+    //container = 'veupathdb/epitopemapping'
+    container = 'epitopemapping'
 
     publishDir "${params.results}/BlastOut", mode: 'copy'
 

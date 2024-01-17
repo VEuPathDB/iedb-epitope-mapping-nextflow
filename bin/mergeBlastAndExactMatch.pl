@@ -26,15 +26,19 @@ sub processEpitopeps{
         chomp $row;
         my @counts_list = split("\t", $row);
         my $proteinID = $counts_list[0];
-        my $peptideID = $counts_list[3];
-        my $matchType = $counts_list[1];
-        my $alignment = $counts_list[2];
-        my $matchStart = $counts_list[5];
-        my $matchEnd = $counts_list[6];
+        my $peptideID = $counts_list[5];
+        my $pepMatch = $counts_list[1];
+        my $proteinMatch = $counts_list[2];
+        my $taxonMatch = $counts_list[3];
+        my $alignment = $counts_list[4];
+        my $matchStart = $counts_list[7];
+        my $matchEnd = $counts_list[8];
         my $key = $proteinID . "_" . $peptideID;
         $peptideHash{$key}{protein} = $proteinID;
         $peptideHash{$key}{peptide} = $peptideID;
-        $peptideHash{$key}{MatchType} = $matchType;
+        $peptideHash{$key}{pepMatch} = $pepMatch;
+        $peptideHash{$key}{proteinMatch} = $proteinMatch;
+        $peptideHash{$key}{taxonMatch} = $taxonMatch;
         $peptideHash{$key}{matchStart} = $matchStart;
         $peptideHash{$key}{matchEnd} = $matchEnd;
         $peptideHash{$key}{alignment} = $alignment;
@@ -144,15 +148,25 @@ sub processEpitopeps{
         } else {
             push @currentList, " ";
         }
-        if (exists($peptideHash{$key}{MatchType})){
-            push @currentList, $peptideHash{$key}{MatchType};
+        if (exists($peptideHash{$key}{pepMatch})){
+            push @currentList, $peptideHash{$key}{pepMatch};
+        } else {
+            push @currentList, " ";
+        }
+        if (exists($peptideHash{$key}{proteinMatch})){
+            push @currentList, $peptideHash{$key}{proteinMatch};
+        } else {
+            push @currentList, " ";
+        }
+        if (exists($peptideHash{$key}{taxonMatch})){
+            push @currentList, $peptideHash{$key}{taxonMatch};
         } else {
             push @currentList, " ";
         }
         
 
         print FH ($currentList[0], "\t", $currentList[1],  "\t", $currentList[2], "\t", $currentList[3],  "\t", $currentList[4], "\t", $currentList[5], "\t", $currentList[6], "\t", 
-        , $currentList[7], "\t", $currentList[8],"\t" , $currentList[9], "\t", $currentList[10], "\t", $currentList[11],  "\n")
+        , $currentList[7], "\t", $currentList[8],"\t" , $currentList[9], "\t", $currentList[10], "\t", $currentList[11],  "\t", $currentList[12], "\t", $currentList[13], "\n")
     }
 }
 
