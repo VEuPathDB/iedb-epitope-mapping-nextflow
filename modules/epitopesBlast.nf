@@ -2,6 +2,22 @@
 nextflow.enable.dsl=2 
 
 
+process fetchTaxon {
+
+    container = 'ncbi/edirect:latest'
+    input:
+      val(taxonID)
+
+    output:
+      path("TaxaList.txt"), emit: taxaFile
+
+    script:
+      template 'fetchTaxa.bash'
+
+
+}
+
+
 process peptideSimilarity {
 
     //container = 'veupathdb/epitopemapping'
@@ -146,7 +162,9 @@ workflow epitopesBlast {
 
     main:
 
-    processPeptides = peptideSimilarity(refFasta, peptidesGeneFasta, peptidesTab, params.taxon)
+    taxonFile = fetchTaxon(params.taxon)
+
+    processPeptides = peptideSimilarity(refFasta, peptidesGeneFasta, peptidesTab, taxonFile.taxaFile)
 
     if (params.blastMethod == "ncbiBlast") {
       database = makeBlastDatabase(processPeptides.peptideFasta) 

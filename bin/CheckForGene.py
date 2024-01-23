@@ -9,7 +9,7 @@ def main(argv):
     epitopetab = ''
     outfile = 'PeptideGene.txt'
     outfasta = 'Peptides.fasta'
-    refTaxa = 0
+    refTaxa = ''
 
     try:
         opts, args = getopt.getopt(argv,"hr:e:l:t:",["refProteome=","epitopeProtein=","epitopetab=", "refTaxa="])
@@ -32,7 +32,15 @@ def main(argv):
     outPut = open(outfile, 'w')
     fastaOut = open(outfasta, 'w')
     peptideTab = open(epitopetab)
-    referenceTaxa = refTaxa
+    taxaFile = open(refTaxa)
+
+    referenceTaxa = []
+    for line in taxaFile:
+    
+        currentLine = line.strip()
+        referenceTaxa.append(int(currentLine))
+
+    #referenceTaxa = refTaxa
     peptideDic = {}
     peptideNames = {}
     peptideTaxa = {}
@@ -43,7 +51,7 @@ def main(argv):
         peptideId = peptidesProperties[1]
         taxa = peptidesProperties[2]
         peptide = peptidesProperties[3]
-        if int(referenceTaxa) == int(taxa):
+        if int(taxa) in referenceTaxa: # int(referenceTaxa) == int(taxa):
             print(">", peptideId, sep="",file=fastaOut)
             print(peptide, file=fastaOut)
 
@@ -69,7 +77,7 @@ def main(argv):
             for pep in peptideList:
                 pepID = peptideNames.get(pep)
                 taxa = peptideTaxa.get(pep)
-                if int(taxa) == int(referenceTaxa):
+                if int(taxa) in referenceTaxa: #== int(referenceTaxa):
                     if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
