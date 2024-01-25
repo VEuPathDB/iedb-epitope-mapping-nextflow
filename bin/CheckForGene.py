@@ -34,7 +34,7 @@ def main(argv):
     peptideTab = open(epitopetab)
     taxaFile = open(refTaxa)
 
-    referenceTaxa = []
+    referenceTaxa = [ ]
     for line in taxaFile:
     
         currentLine = line.strip()
@@ -49,9 +49,9 @@ def main(argv):
         peptidesProperties = line.split("\t")
         protein = peptidesProperties[0]
         peptideId = peptidesProperties[1]
-        taxa = peptidesProperties[2]
+        taxa = int(peptidesProperties[2])
         peptide = peptidesProperties[3]
-        if int(taxa) in referenceTaxa: # int(referenceTaxa) == int(taxa):
+        if taxa in referenceTaxa: # int(referenceTaxa) == int(taxa):
             print(">", peptideId, sep="",file=fastaOut)
             print(peptide, file=fastaOut)
 
@@ -77,31 +77,31 @@ def main(argv):
             for pep in peptideList:
                 pepID = peptideNames.get(pep)
                 taxa = peptideTaxa.get(pep)
-                if int(taxa) in referenceTaxa: #== int(referenceTaxa):
+                if taxa in referenceTaxa: #== int(referenceTaxa):
                     if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id,"\t" ,"Yes", "\t", "Yes","\t", "Yes" ,"\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, file=outPut, sep="")
+                        print(refSeq.id,"\t" ,"Yes", "\t", "Yes","\t", "Yes" ,"\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, "\t", file=outPut, sep="")
                         #"Peptide and protein match; same strain"
                     elif refSeq.seq != pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id, "\t", "Yes", "\t", "No","\t", "Yes", "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, file=outPut, sep="")
+                        print(refSeq.id, "\t", "Yes", "\t", "No","\t", "Yes", "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd,  "\t", taxa, "\t", file=outPut, sep="")
                         #"Only peptide match; same strain"
                 else:
                     if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id,"\t" , "Yes", "\t", "Yes","\t", "No" ,"\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, file=outPut, sep="")
-                        #"Peptide and protein match; different strain"
+                        print(refSeq.id,"\t" , "Yes", "\t", "Yes","\t", "No" ,"\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
+                        #"Peptide and protein match; different strain" 
                     elif refSeq.seq != pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id, "\t", "Yes", "\t", "No","\t", "No" , "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, file=outPut, sep="")
+                        print(refSeq.id, "\t", "Yes", "\t", "No","\t", "No" , "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
                         #"Only peptide match; different strain"
         
     outPut.close()

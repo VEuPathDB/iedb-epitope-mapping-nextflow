@@ -2,5 +2,5 @@
 
 set -euo pipefail
 
-blastp -query ${query} -task blastp-short -word_size 4  -num_descriptions 3 -outfmt 5 -db ${db}/*fa -out ${sample_base}.xml
+blastp -query ${query} -task blastp-short -word_size 2  -evalue 100 -max_target_seqs 10000 -outfmt 5 -db ${db}/*fa -out ${sample_base}.xml
 

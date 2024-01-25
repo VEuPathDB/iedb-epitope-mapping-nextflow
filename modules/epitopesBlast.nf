@@ -21,7 +21,7 @@ process fetchTaxon {
 process peptideSimilarity {
 
     //container = 'veupathdb/epitopemapping'
-    container = 'epitopemapping'
+    //container = 'epitopemapping'
 
     publishDir "${params.results}", mode: 'copy'
 
@@ -44,7 +44,7 @@ process peptideSimilarity {
 process makeBlastDatabase {
 
      //container = 'veupathdb/blastsimilarity'
-     container = 'epitopemapping'
+     //container = 'epitopemapping'
 
     input:
       path(fasta)
@@ -61,7 +61,7 @@ process makeBlastDatabase {
 process blastSeq {
 
     //container = 'veupathdb/blastsimilarity'
-    container = 'epitopemapping'
+    //container = 'epitopemapping'
 
     publishDir "${params.results}/BlastOut", mode: 'copy'
 
