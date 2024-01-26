@@ -81,26 +81,26 @@ def main(argv):
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id,"\t" ,"Yes", "\t", "Yes","\t", "Yes" ,"\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, "\t", file=outPut, sep="")
+                        print(refSeq.id,"\t" ,1, "\t", 1,"\t", 1 ,"\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, "\t", file=outPut, sep="")
 
                     elif refSeq.seq != pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id, "\t", "Yes", "\t", "No","\t", "Yes", "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd,  "\t", taxa, "\t", file=outPut, sep="")
+                        print(refSeq.id, "\t", 1, "\t", 0,"\t", 1, "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd,  "\t", taxa, "\t", file=outPut, sep="")
                         
                 else:
                     if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id,"\t" , "Yes", "\t", "Yes","\t", "No" ,"\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
+                        print(refSeq.id,"\t" , 1, "\t", 1,"\t", 0 ,"\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
                         
                     elif refSeq.seq != pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id, "\t", "Yes", "\t", "No","\t", "No" , "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
+                        print(refSeq.id, "\t", 1, "\t", 0,"\t", 0 , "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
                         
         
     outPut.close()
