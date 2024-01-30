@@ -22,7 +22,7 @@ refFasta = Channel.fromPath(params.refFasta)
 peptidesTab = Channel.fromPath(params.peptidesTab)
 peptidesGeneFasta = Channel.fromPath(params.peptideGeneFasta)
 
-  workflow { 
+workflow {
     epitopesBlast(refFasta, peptidesTab, peptidesGeneFasta)
 }
 

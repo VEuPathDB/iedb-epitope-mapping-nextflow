@@ -34,7 +34,10 @@ def main(argv):
     peptideTab = open(epitopetab)
     taxaFile = open(refTaxa)
 
+    # FIXME:  make this a set instead of list
     referenceTaxa = [ ]
+    # FIXME:  use "with" syntax to open file (filehandle will close automatically)
+
     for line in taxaFile:
     
         currentLine = line.strip()
@@ -46,24 +49,31 @@ def main(argv):
     for lines in peptideTab:
         line = lines.strip()
         peptidesProperties = line.split("\t")
+        # reanme this iedbProtein
         protein = peptidesProperties[0]
         peptideId = peptidesProperties[1]
+        # iedbTaxon not taxa
         taxa = int(peptidesProperties[2])
         peptide = peptidesProperties[3]
         if taxa in referenceTaxa: 
             print(">", peptideId, sep="",file=fastaOut)
             print(peptide, file=fastaOut)
 
+
+
+        # TODO: make a Peptide class which has instance variables for taxon,iedbid and proteinAccession
         if protein in peptideDic:
             peptideDic[protein].append(peptide)
         else:
             peptideDic[protein] = [peptide]
 
+        # FIXME:  check but error if peptide is found more than once
         if peptide in peptideNames:
             peptideNames[peptide] = peptideId
         else:
             peptideNames[peptide] = peptideId
-        
+
+        # FIXME:  always set. no need for if
         if peptide in peptideTaxa:
             peptideTaxa[peptide] = taxa
         else:
@@ -76,6 +86,7 @@ def main(argv):
             for pep in peptideList:
                 pepID = peptideNames.get(pep)
                 taxa = peptideTaxa.get(pep)
+                # FIXME:  set all variables in if/else and print one time at bottom
                 if taxa in referenceTaxa: 
                     if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
@@ -95,7 +106,7 @@ def main(argv):
                         matchStart = match.start() + 1
                         matchEnd = match.end()
                         print(refSeq.id,"\t" , 1, "\t", 1,"\t", 0 ,"\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
-                        
+                p
                     elif refSeq.seq != pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1

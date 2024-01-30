@@ -3,7 +3,7 @@ nextflow.enable.dsl=2
 
 
 process fetchTaxon {
-
+    //FIXME:  Update the containter here to the veupath one
     container = 'ncbi/edirect:latest'
     input:
       val(taxonID)
@@ -35,6 +35,7 @@ process peptideSimilarity {
     output:
       path("*Peptides.fasta"), emit: peptideFasta
       path("*PeptideGene.txt"), emit: pepResults
+
 
     script:
       template 'ProcessPeptides.bash'
