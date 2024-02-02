@@ -2,8 +2,7 @@
 
 set -euo pipefail
 
-mkdir BlastDB
+#mkdir BlastDB
+cat ${fasta} | sed -e 's/ le.*//g' > ${sample_base}.fasta
 
-cat ${fasta} > BlastDB/${sample_base}.fa
-
-makeblastdb -in BlastDB/${sample_base}.fa   -title "Cookbook demo" -dbtype prot  
+makeblastdb -in ${sample_base}.fasta   -dbtype prot  

@@ -5,9 +5,10 @@ use warnings;
 use Data::Dumper;
 use Getopt::Long;
 
-my ($exactMatch, $blast);
+my ($exactMatch, $blast, $ResulstOut);
 &GetOptions("exactMatchFiles=s"=> \$exactMatch,
             "blastOutput=s"=> \$blast,
+            "ResulstOut=s"=> \$ResulstOut,
            ) ;
 die("Please provide both input and out put") unless ($exactMatch & $blast);
 
@@ -15,7 +16,7 @@ my $peptideMatchFile = $exactMatch;
 
 my $blastFile = $blast;
 
-my $outFile = "./EpitopesSearchResults.txt";
+my $outFile = $ResulstOut;
 
 sub processEpitopeps{
     open(my $pepHandle, $peptideMatchFile) or die "Could not open file '$peptideMatchFile' $!";

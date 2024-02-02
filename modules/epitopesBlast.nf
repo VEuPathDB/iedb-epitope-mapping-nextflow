@@ -2,6 +2,12 @@
 nextflow.enable.dsl=2 
 
 
+/**
+* fetchTaxon takes in an NCBI taxon ID and retun all of it child taxa.
+*
+* @taxonID is the NCBI taxon ID
+*/
+
 process fetchTaxon {
     //FIXME:  Update the containter here to the veupath one
     container = 'ncbi/edirect:latest'
@@ -17,24 +23,37 @@ process fetchTaxon {
 
 }
 
+/**
+* The process below take in reference proteome, peptide source proteome, peptide tab file and a taxon ID to 
+* identity if a the reference exactly matches a peptide protein and weather the peptide match and the referece taxon is the same as peptide source taxon.
+* 
+* If the peptide source taxon and reference taxon are the same, the peptide is added and save into a fasta file for the blast below. 
+* @refFasta is the reference proteome fasta
+* @pepfasta is the peptide proteome fasta
+* @pepTab is the peptide tab file
+* @taxon is the tacon of the reference
+*/
 
-process peptideSimilarity {
+process peptideExactMatches {
 
-    container = 'veupathdb/epitopemapping'
+    //container = 'veupathdb/epitopemapping'
+    container = 'epitopemapping'
 
 
-    publishDir "${params.results}", mode: 'copy'
+    publishDir "${params.results}", mode: 'copy', pattern: "*txt"
 
 
     input:
       path(refFasta)
       path(pepfasta)
       path(pepTab)
-      val(taxa)
+      val(taxon)
+      val(peptideMatchResults)
+      val(peptidesFilteredBySpeciesFasta)
 
     output:
-      path("*Peptides.fasta"), emit: peptideFasta
-      path("*PeptideGene.txt"), emit: pepResults
+      path("*fasta"), emit: peptideFasta
+      path("*txt"), emit: pepResults
 
 
     script:
@@ -44,13 +63,15 @@ process peptideSimilarity {
 
 process makeBlastDatabase {
 
+     publishDir "${params.blastDb}"
+
      container = 'veupathdb/blastsimilarity'
 
     input:
       path(fasta)
 
     output:
-      path("BlastDB"), emit: db
+      path("*.fasta*")
     script:
        sample_base = fasta.getSimpleName()
        template 'makeBlastDb.bash'
@@ -73,51 +94,17 @@ process blastSeq {
       path("${sample_base}*xml"), emit: result
 
     script:
-      sample_base = query.getSimpleName()
+      sample_base = query.getName()
       template 'BlastSeq.bash'
 
 }
 
-process diamondDatabase {
-
-    container = 'veupathdb/diamond'
-
-    input:
-      path(fasta)
-
-    output:
-      path("*dmnd"), emit: db
-
-    script:
-      sample_base = fasta.getSimpleName()
-      template 'makeDiamondDb.bash'
-    
-}
-
-process diamondBlast {
-
-    container = 'veupathdb/diamond'
-
-    publishDir "${params.results}/BlastOut", mode: 'copy'
-
-    input:
-      path(query)
-      path(db)
-
-    output:
-      path("*xml"), emit: result
-
-    script:
-      sample_base = query.getSimpleName()
-      template 'diamondBlast.bash'
-
-}   
 
 process processXml {
 
-     container = 'veupathdb/epitopemapping'
+     container = 'epitopemapping'
 
-    publishDir "${params.results}/BlastOut", mode: 'copy'
+    //publishDir "${params.results}/BlastOut", mode: 'copy'
 
     input:
       path(xml)
@@ -129,17 +116,23 @@ process processXml {
     script:
       template 'processBlastXml.bash'
 }
+/**
+* mergeeResultsFiles merges the results from the exact matches and the blast into a single output
 
+* @exactMatch output of the exact match above
+* @balstOutput
+*/
 
 process mergeeResultsFiles {
 
-    container = 'veupathdb/epitopemapping'
+    container = 'epitopemapping'
     
     publishDir "${params.results}/BlastOut", mode: 'copy'
 
     input:
       path(exactMatch)
-      path(balst)
+      path(balstOutput)
+      val(peptideMatchBlastCombiedResults)
     
   
 
@@ -160,22 +153,19 @@ workflow epitopesBlast {
 
     main:
 
-    taxonFile = fetchTaxon(params.taxon)
+   taxonFile = fetchTaxon(params.taxon)
 
-    processPeptides = peptideSimilarity(refFasta, peptidesGeneFasta, peptidesTab, taxonFile.taxaFile)
+    processPeptides = peptideExactMatches(refFasta, peptidesGeneFasta, peptidesTab, taxonFile.taxaFile, params.peptideMatchResults, params.peptidesFilteredBySpeciesFasta)
+                      .peptideFasta
+                      .splitFasta(by: 1000, file:true)
 
-    if (params.blastMethod == "ncbiBlast") {
-      database = makeBlastDatabase(processPeptides.peptideFasta) 
-      blastResults = blastSeq(refFasta, database.db)
-    
-    } else if (params.blastMethod == "diamond") {
+    database = makeBlastDatabase(refFasta) 
 
-      database = diamondDatabase(processPeptides.peptideFasta) 
-      blastResults = diamondBlast(refFasta, database.db)
-    }
+    blastResults = blastSeq(processPeptides, params.blastDb )
+  
 
     processResults = processXml(blastResults.result)
 
-    mergeFiles = mergeeResultsFiles(processPeptides.pepResults, processResults.resultFormated)
+//    mergeFiles = mergeeResultsFiles(processPeptides.pepResults, processResults.resultFormated, params.peptideMatchBlastCombiedResults)
 
 }

@@ -7,18 +7,18 @@ def main(argv):
     refProteome = ''
     epitopeProtein = ''
     epitopetab = ''
-    outfile = 'PeptideGene.txt'
-    outfasta = 'Peptides.fasta'
+    peptideMatchOutput = ''
+    filteredPeptideFasta = ''
     refTaxa = ''
 
     try:
-        opts, args = getopt.getopt(argv,"hr:e:l:t:",["refProteome=","epitopeProtein=","epitopetab=", "refTaxa="])
+        opts, args = getopt.getopt(argv,"hr:e:l:t:p:o:",["refProteome=","epitopeProtein=","epitopetab=", "refTaxa=", "peptideMatchOutput=", "filteredPeptideFasta="])
     except getopt.GetoptError:
-        print ('CheckForGene.py -r <refProeteom> -e <epitopeProtein> -l <epitopetab> -t <refTaxa>')   
+        print ('CheckForGene.py -r <refProteome> -e <epitopeProtein> -l <epitopetab> -t <refTaxa> -p <peptideMatchOutput> -o <filteredPeptideFasta>')   
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print ('CheckForGene.py -r <refProeteom> -e <epitopeProtein> -l <epitopetab> -t <refTaxa>')
+            print ('CheckForGene.py -r <refProteome> -e <epitopeProtein> -l <epitopetab> -t <refTaxa> -p <peptideMatchOutput> -o <filteredPeptideFasta>')
             sys.exit()
         elif opt in ("-r", "--refProteome"):
             refProteome = arg
@@ -28,21 +28,30 @@ def main(argv):
             epitopetab = arg
         elif opt in ("-t", "--refTaxa"):
             refTaxa = arg
+        elif opt in ("-p", "--peptideMatchOutput"):
+            peptideMatchOutput = arg
+        elif opt in ("-o", "--filteredPeptideFasta"):
+            filteredPeptideFasta = arg
    
-    outPut = open(outfile, 'w')
-    fastaOut = open(outfasta, 'w')
+    outPut = open(peptideMatchOutput, 'w')
+    fastaOut = open(filteredPeptideFasta, 'w')
     peptideTab = open(epitopetab)
-    taxaFile = open(refTaxa)
+    
 
     # FIXME:  make this a set instead of list
     referenceTaxa = [ ]
-    # FIXME:  use "with" syntax to open file (filehandle will close automatically)
 
-    for line in taxaFile:
+    try:
+        with open(refTaxa) as taxaFile:
+            for line in taxaFile:
+        
+                currentLine = line.strip()
+                referenceTaxa.append(int(currentLine))
+    except FileNotFoundError:
+        print(print(f"File {refTaxa} not found!", file=sys.stderr))
+
+    referenceTaxa = set(referenceTaxa)
     
-        currentLine = line.strip()
-        referenceTaxa.append(int(currentLine))
-
     peptideDic = {}
     peptideNames = {}
     peptideTaxa = {}

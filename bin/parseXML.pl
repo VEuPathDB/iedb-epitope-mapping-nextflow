@@ -24,11 +24,11 @@ foreach my $query (@queries) {
 
    my $refName = ($query->findvalue('./Iteration_query-def')); 
    my @refNameSplit = split / /, $refName;
-   my $name = $refNameSplit[0];
+   my $pepID = $refNameSplit[0];
 
    my @peptideID = ($query->findnodes('./Iteration_hits/Hit')); 
    foreach my $hit (@peptideID) {
-        my $pepID = $hit->findvalue('./Hit_def');
+        my $name = $hit->findvalue('./Hit_def');
         my $pepLen = $hit->findvalue('./Hit_len');
         my @Hit_hsps = ($hit->findnodes('./Hit_hsps/Hsp'));
         
