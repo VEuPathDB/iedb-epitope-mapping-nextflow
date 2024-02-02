@@ -166,6 +166,8 @@ workflow epitopesBlast {
 
     processResults = processXml(blastResults.result)
 
+    combinedBlastResults = processResults.resultFormated.collect().view()
+
 //    mergeFiles = mergeeResultsFiles(processPeptides.pepResults, processResults.resultFormated, params.peptideMatchBlastCombiedResults)
 
 }
