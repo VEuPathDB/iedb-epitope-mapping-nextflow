@@ -37,8 +37,6 @@ def main(argv):
     fastaOut = open(filteredPeptideFasta, 'w')
     peptideTab = open(epitopetab)
     
-
-    # FIXME:  make this a set instead of list
     referenceTaxa = [ ]
 
     try:
@@ -58,23 +56,22 @@ def main(argv):
     for lines in peptideTab:
         line = lines.strip()
         peptidesProperties = line.split("\t")
-        # reanme this iedbProtein
-        protein = peptidesProperties[0]
+
+        iedbProtein = peptidesProperties[0]
         peptideId = peptidesProperties[1]
-        # iedbTaxon not taxa
-        taxa = int(peptidesProperties[2])
+        iedbTaxon = int(peptidesProperties[2])
         peptide = peptidesProperties[3]
-        if taxa in referenceTaxa: 
+        if iedbTaxon in referenceTaxa: 
             print(">", peptideId, sep="",file=fastaOut)
             print(peptide, file=fastaOut)
 
 
 
         # TODO: make a Peptide class which has instance variables for taxon,iedbid and proteinAccession
-        if protein in peptideDic:
-            peptideDic[protein].append(peptide)
+        if iedbProtein in peptideDic:
+            peptideDic[iedbProtein].append(peptide)
         else:
-            peptideDic[protein] = [peptide]
+            peptideDic[iedbProtein] = [peptide]
 
         # FIXME:  check but error if peptide is found more than once
         if peptide in peptideNames:
@@ -82,11 +79,8 @@ def main(argv):
         else:
             peptideNames[peptide] = peptideId
 
-        # FIXME:  always set. no need for if
-        if peptide in peptideTaxa:
-            peptideTaxa[peptide] = taxa
-        else:
-            peptideTaxa[peptide] = taxa
+        
+        peptideTaxa[peptide] = iedbTaxon
 
     for refSeq in SeqIO.parse(refProteome, "fasta"):
         for pepSeq in SeqIO.parse(epitopeProtein, "fasta"):
@@ -94,32 +88,34 @@ def main(argv):
            
             for pep in peptideList:
                 pepID = peptideNames.get(pep)
-                taxa = peptideTaxa.get(pep)
-                # FIXME:  set all variables in if/else and print one time at bottom
-                if taxa in referenceTaxa: 
+                taxon = peptideTaxa.get(pep)
+                # same means the peptide is found in reference protein or peptide protein and reference protein are the same or taxon of reference and peptide is the same.  
+                same = 1
+                different = 0
+                if taxon in referenceTaxa: 
                     if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id,"\t" ,1, "\t", 1,"\t", 1 ,"\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, "\t", file=outPut, sep="")
+                        print(refSeq.id,"\t" ,same, "\t", same,"\t", same ,"\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxon, "\t", file=outPut, sep="")
 
                     elif refSeq.seq != pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id, "\t", 1, "\t", 0,"\t", 1, "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd,  "\t", taxa, "\t", file=outPut, sep="")
+                        print(refSeq.id, "\t", same, "\t", different,"\t", same, "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd,  "\t", taxon, "\t", file=outPut, sep="")
                         
                 else:
                     if refSeq.seq == pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id,"\t" , 1, "\t", 1,"\t", 0 ,"\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
+                        print(refSeq.id,"\t" , same, "\t", same,"\t", different ,"\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxon, file=outPut, sep="")
                     elif refSeq.seq != pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1
                         matchEnd = match.end()
-                        print(refSeq.id, "\t", 1, "\t", 0,"\t", 0 , "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
+                        print(refSeq.id, "\t", same, "\t", different,"\t", different , "\t", pep, "\t", pepID, "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxon, file=outPut, sep="")
                         
         
     outPut.close()
