@@ -189,7 +189,7 @@ workflow epitopesBlast {
 
     blastMerge = mergeBlastResults(processResults.resultFormated.collect())
                  
-    processPeptides.pepResults.view()
+    
     mergeFiles = mergeResultsFiles(processPeptides.pepResults, blastMerge, params.peptideMatchBlastCombinedResults)
 
 }
