@@ -7,9 +7,11 @@ use open qw(:std :utf8);
 use Getopt::Long;
 
 my ($xmlFile);
+my ($outputFile);
 &GetOptions("inputXml=s"=> \$xmlFile,
+            "outputFile=s"=> \$outputFile,
            ) ;
-die("Please provide both input and out put") unless ($xmlFile );
+die("Please provide both input and out put") unless ($xmlFile & $outputFile);
 
 
 my $xml = XML::LibXML->load_xml(location => $xmlFile);
@@ -17,7 +19,7 @@ my $xml = XML::LibXML->load_xml(location => $xmlFile);
 my @queries = $xml->findnodes('/BlastOutput/BlastOutput_iterations/Iteration');
 
 
-my $outfile = "./ProcessBlastResults.txt";
+my $outfile = $outputFile;
 open(FH, '>>', $outfile) or die $!;
 
 foreach my $query (@queries) {

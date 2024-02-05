@@ -115,7 +115,6 @@ def main(argv):
                         matchStart = match.start() + 1
                         matchEnd = match.end()
                         print(refSeq.id,"\t" , 1, "\t", 1,"\t", 0 ,"\t", pep, "\t", pepID,  "\t", pepSeq.id, "\t", matchStart, "\t", matchEnd, "\t", taxa, file=outPut, sep="")
-                p
                     elif refSeq.seq != pepSeq.seq and pep in refSeq.seq:
                         match=(re.search(str(pep), str(refSeq.seq)))
                         matchStart = match.start() + 1

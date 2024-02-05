@@ -84,7 +84,7 @@ process blastSeq {
     container = 'veupathdb/blastsimilarity'
     
 
-    publishDir "${params.results}/BlastOut", mode: 'copy'
+    //publishDir "${params.results}/BlastOut", mode: 'copy'
 
     input:
       path(query)
@@ -114,6 +114,7 @@ process processXml {
 
 
     script:
+      sample_base = xml.getName()
       template 'processBlastXml.bash'
 }
 /**
@@ -123,11 +124,28 @@ process processXml {
 * @balstOutput
 */
 
-process mergeeResultsFiles {
+process mergeBlastResults {
+
+  input:
+    path(blast)
+
+  
+  output:
+    path("*txt")
+
+  script:
+    """
+    cat ${blast} > BlastCombinedResults.txt
+    """
+
+
+}
+
+process mergeResultsFiles {
 
     container = 'epitopemapping'
     
-    publishDir "${params.results}/BlastOut", mode: 'copy'
+    publishDir "${params.results}", mode: 'copy'
 
     input:
       path(exactMatch)
@@ -155,19 +173,23 @@ workflow epitopesBlast {
 
    taxonFile = fetchTaxon(params.taxon)
 
+   database = makeBlastDatabase(refFasta) 
+
     processPeptides = peptideExactMatches(refFasta, peptidesGeneFasta, peptidesTab, taxonFile.taxaFile, params.peptideMatchResults, params.peptidesFilteredBySpeciesFasta)
-                      .peptideFasta
-                      .splitFasta(by: 1000, file:true)
+                      
+                      
+    peptideFiless =  processPeptides.peptideFasta
+                    .splitFasta(by: 1000, file:true)
 
-    database = makeBlastDatabase(refFasta) 
-
-    blastResults = blastSeq(processPeptides, params.blastDb )
+    blastResults = blastSeq(peptideFiless, params.blastDb )
   
 
     processResults = processXml(blastResults.result)
 
-    combinedBlastResults = processResults.resultFormated.collect().view()
 
-//    mergeFiles = mergeeResultsFiles(processPeptides.pepResults, processResults.resultFormated, params.peptideMatchBlastCombiedResults)
+    blastMerge = mergeBlastResults(processResults.resultFormated.collect())
+                 
+    processPeptides.pepResults.view()
+    mergeFiles = mergeResultsFiles(processPeptides.pepResults, blastMerge, params.peptideMatchBlastCombinedResults)
 
 }
