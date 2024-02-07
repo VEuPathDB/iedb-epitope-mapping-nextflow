@@ -104,8 +104,6 @@ process processXml {
 
      container = 'epitopemapping'
 
-    //publishDir "${params.results}/BlastOut", mode: 'copy'
-
     input:
       path(xml)
 

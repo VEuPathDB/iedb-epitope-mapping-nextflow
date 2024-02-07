@@ -26,6 +26,10 @@ include { epitopesBlast } from  './modules/epitopesBlast.nf'
   if(!params.peptidesFilteredBySpeciesFasta) {
     throw new Exception("Missing parameter params.peptidesFilteredBySpeciesFasta")
   }
+  if(!params.peptideMatchBlastCombinedResults) {
+    throw new Exception("Missing parameter params.peptideMatchBlastCombinedResults")
+  }
+  
 
 refFasta = Channel.fromPath(params.refFasta, checkIfExists: true)
 peptidesTab = Channel.fromPath(params.peptidesTab, checkIfExists: true)
