@@ -56,26 +56,31 @@ def main(argv):
 
     class Epitope:
         def __init__(self, peptideID, proteinID, peptideTaxon, peptide, sequence):
-            self.peptideID = peptideID
-            self.proteinID = proteinID
-            self.peptideTaxon = peptideTaxon
-            self.peptide = peptide
-            self.sequence = sequence
-    
+            self._peptideID = peptideID
+            self._proteinID = proteinID
+            self._peptideTaxon = peptideTaxon
+            self._peptide = peptide
+            self._sequence = sequence
+        
+        @property
         def peptideID(self):
-            return self.peptideID   
-    
-        def proteinID(self):
-            return self.proteinID
-        
-        def peptideTaxon(self):
-            return self.peptideTaxon  
+            return self._peptideID   
 
-        def peptide(self):
-            return self.peptide
+        @property
+        def proteinID(self):
+            return self._proteinID
         
+        @property
+        def peptideTaxon(self):
+            return self._peptideTaxon  
+
+        @property
+        def peptide(self):
+            return self._peptide
+        
+        @property
         def sequence(self):
-            return self.sequence
+            return self._sequence
     
     epitopeDict = {}
     try:
