@@ -9,8 +9,8 @@ nextflow.enable.dsl=2
 */
 
 process fetchTaxon {
-    //FIXME:  Update the containter here to the veupath one
-    container = 'ncbi/edirect:latest'
+    
+    container = 'veupathdb/edirect'
     input:
       val(taxonID)
 
@@ -36,9 +36,7 @@ process fetchTaxon {
 
 process peptideExactMatches {
 
-    //container = 'veupathdb/epitopemapping'
-    container = 'epitopemapping'
-
+    container = 'veupathdb/epitopemapping'
 
     publishDir "${params.results}", mode: 'copy', pattern: "*txt"
 
@@ -102,7 +100,7 @@ process blastSeq {
 
 process processXml {
 
-     container = 'epitopemapping'
+     container = 'veupathdb/epitopemapping'
 
     input:
       path(xml)
@@ -124,6 +122,8 @@ process processXml {
 
 process mergeBlastResults {
 
+   container = 'veupathdb/epitopemapping'
+
   input:
     path(blast)
 
@@ -141,7 +141,7 @@ process mergeBlastResults {
 
 process mergeResultsFiles {
 
-    container = 'epitopemapping'
+     container = 'veupathdb/epitopemapping'
     
     publishDir "${params.results}", mode: 'copy'
 
@@ -169,13 +169,13 @@ workflow epitopesBlast {
 
     main:
 
-   taxonFile = fetchTaxon(params.taxon)
+    taxonFile = fetchTaxon(params.taxon)
 
-   database = makeBlastDatabase(refFasta) 
+    database = makeBlastDatabase(refFasta) 
 
     processPeptides = peptideExactMatches(refFasta, peptidesGeneFasta, peptidesTab, taxonFile.taxaFile, params.peptideMatchResults, params.peptidesFilteredBySpeciesFasta)
                       
-                      
+                     
     peptideFiless =  processPeptides.peptideFasta
                     .splitFasta(by: 1000, file:true)
 

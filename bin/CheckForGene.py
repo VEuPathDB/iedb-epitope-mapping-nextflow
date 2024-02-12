@@ -3,6 +3,41 @@
 from Bio import SeqIO
 import sys, getopt, re
 
+def getPeptideMatches(peptide, refSeq):
+    match=re.search(peptide, refSeq)
+    matchStart = match.start() + 1
+    matchEnd = match.end()
+    return(matchStart, matchEnd)
+
+
+class Epitope:
+        def __init__(self, peptideID, proteinID, peptideTaxon, peptide, sequence):
+            self._peptideID = peptideID
+            self._proteinID = proteinID
+            self._peptideTaxon = peptideTaxon
+            self._peptide = peptide
+            self._sequence = sequence
+        
+        @property
+        def peptideID(self):
+            return self._peptideID   
+
+        @property
+        def proteinID(self):
+            return self._proteinID
+        
+        @property
+        def peptideTaxon(self):
+            return self._peptideTaxon  
+
+        @property
+        def peptide(self):
+            return self._peptide
+        
+        @property
+        def sequence(self):
+            return self._sequence
+
 def main(argv):
     refProteome = ''
     epitopeProtein = ''
@@ -53,34 +88,6 @@ def main(argv):
     proteinDict = {}
     for refSeq in SeqIO.parse(epitopeProtein, "fasta"):
         proteinDict[refSeq.id] = refSeq.seq
-
-    class Epitope:
-        def __init__(self, peptideID, proteinID, peptideTaxon, peptide, sequence):
-            self._peptideID = peptideID
-            self._proteinID = proteinID
-            self._peptideTaxon = peptideTaxon
-            self._peptide = peptide
-            self._sequence = sequence
-        
-        @property
-        def peptideID(self):
-            return self._peptideID   
-
-        @property
-        def proteinID(self):
-            return self._proteinID
-        
-        @property
-        def peptideTaxon(self):
-            return self._peptideTaxon  
-
-        @property
-        def peptide(self):
-            return self._peptide
-        
-        @property
-        def sequence(self):
-            return self._sequence
     
     epitopeDict = {}
     try:
@@ -99,7 +106,7 @@ def main(argv):
                     print(peptide, file=fastaOut)
 
                 c1 = Epitope(peptideId, protID, iedbTaxon, peptide, sequence)
-                epitopeDict[peptideId] = c1
+                epitopeDict[peptideId] = c1 # line 102
     except FileNotFoundError:
          print(print(f"File {epitopetab} not found!", file=sys.stderr))
 
@@ -108,7 +115,7 @@ def main(argv):
 
     for refSeq in SeqIO.parse(refProteome, "fasta"):    
         
-        for epitopeInstance in epitopeDict:
+        for epitopeInstance in epitopeDict: # line 111
             peptideID = epitopeDict[epitopeInstance].peptideID
             peptideProteinSeq = epitopeDict[epitopeInstance].sequence
             peptideTaxon = epitopeDict[epitopeInstance].peptideTaxon
@@ -117,29 +124,44 @@ def main(argv):
         
             if peptideTaxon in referenceTaxa:
                 if refSeq.seq == peptideProteinSeq and str(peptideSeq) in refSeq.seq:
-                    match=(re.search(str(peptideSeq), str(refSeq.seq)))
-                    matchStart = match.start() + 1
-                    matchEnd = match.end()
-                    print(refSeq.id,"\t" ,same, "\t", same,"\t", same ,"\t", peptideSeq, "\t", peptideID,  "\t", proteinID, "\t", matchStart, "\t", matchEnd, "\t", peptideTaxon, "\t", file=outPut, sep="")
+                    matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
+
+                    id = refSeq.id
+                    peptideMatch = same
+                    proteinMatch = same
+                    TaxonMatch = same
+
+                    print(f'{id}\t{peptideMatch}\t{proteinMatch}\t{TaxonMatch}\t{peptideSeq}\t{peptideID}\t{proteinID}\t{matchStart}\t{matchEnd}\t{peptideTaxon}', file=outPut)
 
                 elif refSeq.seq != peptideProteinSeq and peptideSeq in refSeq.seq:
-                    match=(re.search(str(peptideSeq), str(refSeq.seq)))
-                    matchStart = match.start() + 1
-                    matchEnd = match.end()
-                    print(refSeq.id, "\t", same, "\t", different,"\t", same, "\t", peptideSeq, "\t", peptideID, "\t", proteinID, "\t", matchStart, "\t", matchEnd,  "\t", peptideTaxon, "\t", file=outPut, sep="")
+                    matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
+                    id = refSeq.id
+                    peptideMatch = same
+                    proteinMatch = different
+                    TaxonMatch = same
+
+                    print(f'{id}\t{peptideMatch}\t{proteinMatch}\t{TaxonMatch}\t{peptideSeq}\t{peptideID}\t{proteinID}\t{matchStart}\t{matchEnd}\t{peptideTaxon}', file=outPut)
                     
             else:
                 if refSeq.seq == peptideProteinSeq and peptideSeq in refSeq.seq:
-                    match=(re.search(str(peptideSeq), str(refSeq.seq)))
-                    matchStart = match.start() + 1
-                    matchEnd = match.end()
-                    print(refSeq.id,"\t" , same, "\t", same,"\t", different ,"\t", peptideSeq, "\t", peptideID,  "\t", proteinID, "\t", matchStart, "\t", matchEnd, "\t", peptideTaxon, file=outPut, sep="")
-                elif refSeq.seq != peptideProteinSeq and peptideSeq in refSeq.seq:
-                    match=(re.search(str(peptideSeq), str(refSeq.seq)))
-                    matchStart = match.start() + 1
-                    matchEnd = match.end()
-                    print(refSeq.id, "\t", same, "\t", different,"\t", different , "\t", peptideSeq, "\t", peptideID, "\t", proteinID, "\t", matchStart, "\t", matchEnd, "\t", peptideTaxon, file=outPut, sep="")
+                    matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
+
+                    id = refSeq.id
+                    peptideMatch = same
+                    proteinMatch = same
+                    TaxonMatch = different
                     
+                    print(f'{id}\t{peptideMatch}\t{proteinMatch}\t{TaxonMatch}\t{peptideSeq}\t{peptideID}\t{proteinID}\t{matchStart}\t{matchEnd}\t{peptideTaxon}', file=outPut)
+                
+                elif refSeq.seq != peptideProteinSeq and peptideSeq in refSeq.seq:
+                    matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
+
+                    id = refSeq.id
+                    peptideMatch = same
+                    proteinMatch = different
+                    TaxonMatch = different
+
+                    print(f'{id}\t{peptideMatch}\t{proteinMatch}\t{TaxonMatch}\t{peptideSeq}\t{peptideID}\t{proteinID}\t{matchStart}\t{matchEnd}\t{peptideTaxon}', file=outPut)
     
     outPut.close()
     fastaOut.close()
