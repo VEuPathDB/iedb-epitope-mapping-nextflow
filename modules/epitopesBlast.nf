@@ -80,9 +80,6 @@ process makeBlastDatabase {
 process blastSeq {
 
     container = 'veupathdb/blastsimilarity'
-    
-
-    //publishDir "${params.results}/BlastOut", mode: 'copy'
 
     input:
       path(query)
