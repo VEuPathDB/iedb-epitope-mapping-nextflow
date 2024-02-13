@@ -43,15 +43,15 @@ process peptideExactMatches {
 
     input:
       path(refFasta)
-      path(pepfasta)
+      path(pepProtfasta)
       path(pepTab)
       val(taxon)
-      val(peptideMatchResults)
-      val(peptidesFilteredBySpeciesFasta)
+      val(peptideMatchResultsOutput)
+      val(peptidesFilteredBySpeciesFastaOutput)
 
     output:
-      path("*fasta"), emit: peptideFasta
-      path("*txt"), emit: pepResults
+      path(peptidesFilteredBySpeciesFastaOutput), emit: peptideFasta
+      path(peptideMatchResultsOutput), emit: pepResults
 
 
     script:
@@ -138,9 +138,10 @@ process mergeBlastResults {
 
 process mergeResultsFiles {
 
-     container = 'veupathdb/epitopemapping'
+    container = 'veupathdb/epitopemapping'
     
-    publishDir "${params.results}", mode: 'copy'
+    publishDir "${params.results}", mode: 'copy', overwrite: false
+
 
     input:
       path(exactMatch)
@@ -150,7 +151,7 @@ process mergeResultsFiles {
   
 
     output:
-      path("*txt")
+      path(params.peptideMatchBlastCombinedResults)
 
     script:
       template 'mergeFiles.bash'
@@ -168,23 +169,27 @@ workflow epitopesBlast {
 
     taxonFile = fetchTaxon(params.taxon)
 
-    database = makeBlastDatabase(refFasta) 
+    database = makeBlastDatabase(refFasta)
+
 
     processPeptides = peptideExactMatches(refFasta, peptidesGeneFasta, peptidesTab, taxonFile.taxaFile, params.peptideMatchResults, params.peptidesFilteredBySpeciesFasta)
                       
-                     
-    peptideFiless =  processPeptides.peptideFasta
+  // TODO: make the number here a param
+    peptideFiles =  processPeptides.peptideFasta
                     .splitFasta(by: 1000, file:true)
 
-    blastResults = blastSeq(peptideFiless, params.blastDb )
+
+  // TODO:  use database.first()?? instead of this extra param
+    blastResults = blastSeq(peptideFiles, params.blastDb )
   
 
     processResults = processXml(blastResults.result)
 
 
+  // TODO:  replace with processResults.resultFormated.collectFile(name: "mergedOutput.txt", storeDir: params.blahDir)
     blastMerge = mergeBlastResults(processResults.resultFormated.collect())
                  
     
-    mergeFiles = mergeResultsFiles(processPeptides.pepResults, blastMerge, params.peptideMatchBlastCombinedResults)
+    mergeFiles = mergeResultsFiles(processPeptides.pepResults, blastMerge)
 
 }

@@ -2,4 +2,5 @@
 
 set -euo pipefail
 
-parseXML.pl --inputXml ${xml} --outputFile ${sample_base}.txt
+parseXML.pl --inputXml ${xml} \
+    --outputFile ${sample_base}.txt

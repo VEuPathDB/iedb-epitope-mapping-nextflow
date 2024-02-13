@@ -85,9 +85,9 @@ def main(argv):
 
     referenceTaxa = set(referenceTaxa)
 
-    proteinDict = {}
-    for refSeq in SeqIO.parse(epitopeProtein, "fasta"):
-        proteinDict[refSeq.id] = refSeq.seq
+    pepProtDict = {}
+    for pepProtSeq in SeqIO.parse(epitopeProtein, "fasta"):
+        pepProtDict[pepProtSeq.id] = pepProtSeq.seq
     
     epitopeDict = {}
     try:
@@ -100,8 +100,10 @@ def main(argv):
                 iedbTaxon = int(peptidesProperties[2])
                 peptide = peptidesProperties[3]
                 protID = peptidesProperties[0]
-                sequence = proteinDict.get(protID)
-                if iedbTaxon in referenceTaxa: 
+                sequence = pepProtDict.get(protID)
+
+                # TODO: use Seqio to write fasta
+                if iedbTaxon in referenceTaxa:
                     print(">", peptideId, sep="",file=fastaOut)
                     print(peptide, file=fastaOut)
 
@@ -121,7 +123,15 @@ def main(argv):
             peptideTaxon = epitopeDict[epitopeInstance].peptideTaxon
             proteinID = epitopeDict[epitopeInstance].proteinID
             peptideSeq = epitopeDict[epitopeInstance].peptide
-        
+
+
+            peptideMatch = 0
+            proteinMatch = 0
+            TaxonMatch = 0
+            matchStart = None
+            matchEnd = None
+
+
             if peptideTaxon in referenceTaxa:
                 if refSeq.seq == peptideProteinSeq and str(peptideSeq) in refSeq.seq:
                     matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
@@ -131,7 +141,7 @@ def main(argv):
                     proteinMatch = same
                     TaxonMatch = same
 
-                    print(f'{id}\t{peptideMatch}\t{proteinMatch}\t{TaxonMatch}\t{peptideSeq}\t{peptideID}\t{proteinID}\t{matchStart}\t{matchEnd}\t{peptideTaxon}', file=outPut)
+
 
                 elif refSeq.seq != peptideProteinSeq and peptideSeq in refSeq.seq:
                     matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
@@ -140,8 +150,6 @@ def main(argv):
                     proteinMatch = different
                     TaxonMatch = same
 
-                    print(f'{id}\t{peptideMatch}\t{proteinMatch}\t{TaxonMatch}\t{peptideSeq}\t{peptideID}\t{proteinID}\t{matchStart}\t{matchEnd}\t{peptideTaxon}', file=outPut)
-                    
             else:
                 if refSeq.seq == peptideProteinSeq and peptideSeq in refSeq.seq:
                     matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
@@ -151,8 +159,7 @@ def main(argv):
                     proteinMatch = same
                     TaxonMatch = different
                     
-                    print(f'{id}\t{peptideMatch}\t{proteinMatch}\t{TaxonMatch}\t{peptideSeq}\t{peptideID}\t{proteinID}\t{matchStart}\t{matchEnd}\t{peptideTaxon}', file=outPut)
-                
+
                 elif refSeq.seq != peptideProteinSeq and peptideSeq in refSeq.seq:
                     matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
 
@@ -161,7 +168,7 @@ def main(argv):
                     proteinMatch = different
                     TaxonMatch = different
 
-                    print(f'{id}\t{peptideMatch}\t{proteinMatch}\t{TaxonMatch}\t{peptideSeq}\t{peptideID}\t{proteinID}\t{matchStart}\t{matchEnd}\t{peptideTaxon}', file=outPut)
+            print(f'{id}\t{peptideMatch}\t{proteinMatch}\t{TaxonMatch}\t{peptideSeq}\t{peptideID}\t{proteinID}\t{matchStart}\t{matchEnd}\t{peptideTaxon}', file=outPut)
     
     outPut.close()
     fastaOut.close()

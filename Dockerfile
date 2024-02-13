@@ -11,13 +11,11 @@ RUN apt-get install -y git ant build-essential wget perl \
 default-jre unzip cpanminus bioperl libaio1 libjson-perl libmodule-install-rdf-perl \
 libdate-manip-perl libtext-csv-perl libstatistics-descriptive-perl libtree-dagnode-perl libxml-simple-perl && apt-get clean && apt-get purge && rm -rf /var/lib/apt/lists/* /tmp/*
 
-
 RUN pip install --upgrade pip
-
-WORKDIR /usr/local/
 
 RUN pip install biopython==${biopython_version}
 
+ADD bin/* /usr/bin/
 
-ADD /bin/* /usr/bin/
-RUN cd /usr/bin 
+
+WORKDIR /data

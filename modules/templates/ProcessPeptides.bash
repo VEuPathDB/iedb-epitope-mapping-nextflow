@@ -2,4 +2,9 @@
 
 set -euo pipefail
 
-CheckForGene.py -r ${refFasta} -l ${pepTab}  -e ${pepfasta} -t ${taxon} -p ${peptideMatchResults} -o ${peptidesFilteredBySpeciesFasta}
+CheckForGene.py -r ${refFasta} \
+    -l ${pepTab}  \
+    -e ${pepProtfasta} \
+    -t ${taxon} \
+    -p ${peptideMatchResultsOutput} \
+    -o ${peptidesFilteredBySpeciesFastaOutput}

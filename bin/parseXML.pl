@@ -20,6 +20,8 @@ my @queries = $xml->findnodes('/BlastOutput/BlastOutput_iterations/Iteration');
 
 
 my $outfile = $outputFile;
+
+#FIXME:  should use ">" NOT ">>"
 open(FH, '>>', $outfile) or die $!;
 
 foreach my $query (@queries) {
@@ -44,7 +46,7 @@ foreach my $query (@queries) {
             my $querySequence = $hsp->findvalue('./Hsp_qseq');
             my $hitSequence = $hsp->findvalue('./Hsp_hseq');
             my $alignment = $hsp->findvalue('./Hsp_midline');
-            print FH ($name, "\t", $pepID, "\t", $pepLen, "\t", $bitScore, "\t", $hitStart, "\t", $hitEnd, "\t", $hitIdentity, "\t", $aligmentLength, "\t", $querySequence, 
+            print FH ($name, "\t", $pepID, "\t", $pepLen, "\t", $bitScore, "\t", $hitStart, "\t", $hitEnd, "\t", $hitIdentity, "\t", $aligmentLength, "\t", $querySequence,
             "\t", $hitSequence, "\t", $alignment, "\n");
            
         }
