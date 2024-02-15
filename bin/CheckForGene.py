@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
 from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqRecord import SeqRecord
 import sys, getopt, re
 
 def getPeptideMatches(peptide, refSeq):
@@ -104,8 +106,8 @@ def main(argv):
 
                 # TODO: use Seqio to write fasta
                 if iedbTaxon in referenceTaxa:
-                    print(">", peptideId, sep="",file=fastaOut)
-                    print(peptide, file=fastaOut)
+                    record = SeqRecord(Seq(peptide), id= peptideId)
+                    SeqIO.write(record)
 
                 c1 = Epitope(peptideId, protID, iedbTaxon, peptide, sequence)
                 epitopeDict[peptideId] = c1 
