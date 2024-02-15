@@ -59,6 +59,11 @@ process peptideExactMatches {
 
 }
 
+/*
+* Make a blast database using the reference proteome.
+*
+* @fasta is the input proteome.
+*/
 process makeBlastDatabase {
 
      container = 'veupathdb/blastsimilarity'
@@ -74,6 +79,12 @@ process makeBlastDatabase {
 
 }
 
+/*
+* This process does the blast using the peptide as query and the database created above.
+*
+* @query; is the peptide fasta
+* @db; the blast database build above 
+*/
 
 process blastSeq {
 
