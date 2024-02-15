@@ -61,15 +61,13 @@ process peptideExactMatches {
 
 process makeBlastDatabase {
 
-     publishDir "${params.blastDb}"
-
      container = 'veupathdb/blastsimilarity'
 
     input:
       path(fasta)
 
     output:
-      path("*.fasta*")
+      path("db")
     script:
        sample_base = fasta.getSimpleName()
        template 'makeBlastDb.bash'
@@ -94,6 +92,12 @@ process blastSeq {
 
 }
 
+/*
+* Process the blast xml output to generate a tabular format/
+
+* @xml is the blast xml output file to be used in subsequent steps below
+
+*/
 
 process processXml {
 
@@ -110,32 +114,16 @@ process processXml {
       sample_base = xml.getName()
       template 'processBlastXml.bash'
 }
-/**
-* mergeeResultsFiles merges the results from the exact matches and the blast into a single output
 
-* @exactMatch output of the exact match above
-* @balstOutput
+/*
+
+* This process the merges the exact match searches and the blast out to generate one file as output. 
+
+* @exactMatch is the exact match file from the exact match search
+* @balstOutput is the process blast output file in tabular format
+* @peptideMatchBlastCombiedResults is the name of the output files
+
 */
-
-process mergeBlastResults {
-
-   container = 'veupathdb/epitopemapping'
-
-  input:
-    path(blast)
-
-  
-  output:
-    path("*txt")
-
-  script:
-    """
-    cat ${blast} > BlastCombinedResults.txt
-    """
-
-
-}
-
 process mergeResultsFiles {
 
     container = 'veupathdb/epitopemapping'
@@ -174,22 +162,18 @@ workflow epitopesBlast {
 
     processPeptides = peptideExactMatches(refFasta, peptidesGeneFasta, peptidesTab, taxonFile.taxaFile, params.peptideMatchResults, params.peptidesFilteredBySpeciesFasta)
                       
-  // TODO: make the number here a param
+
     peptideFiles =  processPeptides.peptideFasta
-                    .splitFasta(by: 1000, file:true)
+                    .splitFasta(by: params.chuckSize, file:true)
 
 
-  // TODO:  use database.first()?? instead of this extra param
-    blastResults = blastSeq(peptideFiles, params.blastDb )
+    blastResults = blastSeq(peptideFiles, database.first())
   
 
     processResults = processXml(blastResults.result)
 
-
-  // TODO:  replace with processResults.resultFormated.collectFile(name: "mergedOutput.txt", storeDir: params.blahDir)
-    blastMerge = mergeBlastResults(processResults.resultFormated.collect())
-                 
+    mergeBlast = processResults.resultFormated.collectFile(name: "mergedOutput.txt", newLine: true )
     
-    mergeFiles = mergeResultsFiles(processPeptides.pepResults, blastMerge)
+    mergeFiles = mergeResultsFiles(processPeptides.pepResults, mergeBlast,params.peptideMatchBlastCombinedResults)
 
 }

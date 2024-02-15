@@ -108,7 +108,7 @@ def main(argv):
                     print(peptide, file=fastaOut)
 
                 c1 = Epitope(peptideId, protID, iedbTaxon, peptide, sequence)
-                epitopeDict[peptideId] = c1 # line 102
+                epitopeDict[peptideId] = c1 
     except FileNotFoundError:
          print(print(f"File {epitopetab} not found!", file=sys.stderr))
 
@@ -117,20 +117,18 @@ def main(argv):
 
     for refSeq in SeqIO.parse(refProteome, "fasta"):    
         
-        for epitopeInstance in epitopeDict: # line 111
+        for epitopeInstance in epitopeDict: 
             peptideID = epitopeDict[epitopeInstance].peptideID
             peptideProteinSeq = epitopeDict[epitopeInstance].sequence
             peptideTaxon = epitopeDict[epitopeInstance].peptideTaxon
             proteinID = epitopeDict[epitopeInstance].proteinID
             peptideSeq = epitopeDict[epitopeInstance].peptide
 
-
             peptideMatch = 0
             proteinMatch = 0
             TaxonMatch = 0
             matchStart = None
             matchEnd = None
-
 
             if peptideTaxon in referenceTaxa:
                 if refSeq.seq == peptideProteinSeq and str(peptideSeq) in refSeq.seq:
@@ -140,8 +138,6 @@ def main(argv):
                     peptideMatch = same
                     proteinMatch = same
                     TaxonMatch = same
-
-
 
                 elif refSeq.seq != peptideProteinSeq and peptideSeq in refSeq.seq:
                     matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
@@ -157,8 +153,7 @@ def main(argv):
                     id = refSeq.id
                     peptideMatch = same
                     proteinMatch = same
-                    TaxonMatch = different
-                    
+                    TaxonMatch = different                   
 
                 elif refSeq.seq != peptideProteinSeq and peptideSeq in refSeq.seq:
                     matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
