@@ -29,9 +29,6 @@ include { epitopesBlast } from  './modules/epitopesBlast.nf'
   if(!params.peptideMatchBlastCombinedResults) {
     throw new Exception("Missing parameter params.peptideMatchBlastCombinedResults")
   }
-  if(!params.taxon) {
-    throw new Exception("Missing parameter params.taxon")
-  } 
   if(!params.chuckSize) {
     throw new Exception("Missing parameter params.chuckSize")
   } 
