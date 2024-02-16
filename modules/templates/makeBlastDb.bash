@@ -2,6 +2,7 @@
 
 set -euo pipefail
 
-cat ${fasta} | sed -e 's/ le.*//g' > ${sample_base}.fasta
+mkdir db
+cat ${fasta} | sed -e 's/ le.*//g' > db/${sample_base}.fasta
 
-makeblastdb -in ${sample_base}.fasta   -dbtype prot  
+makeblastdb -in db/${sample_base}.fasta   -dbtype prot  
