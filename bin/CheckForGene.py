@@ -114,9 +114,6 @@ def main(argv):
     except FileNotFoundError:
          print(print(f"File {epitopetab} not found!", file=sys.stderr))
 
-    same = 1
-    different = 0
-
     for refSeq in SeqIO.parse(refProteome, "fasta"):    
         
         for epitopeInstance in epitopeDict: 
@@ -140,33 +137,33 @@ def main(argv):
                     matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
 
                     id = refSeq.id
-                    peptideMatch = same
-                    proteinMatch = same
-                    TaxonMatch = same
+                    peptideMatch = 1
+                    proteinMatch = 1
+                    TaxonMatch = 1
 
                 elif refSeq.seq != peptideProteinSeq and peptideSeq in refSeq.seq:
                     matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
                     id = refSeq.id
-                    peptideMatch = same
-                    proteinMatch = different
-                    TaxonMatch = same
+                    peptideMatch = 1
+                    proteinMatch = 0
+                    TaxonMatch = 1
 
             else:
                 if refSeq.seq == peptideProteinSeq and peptideSeq in refSeq.seq:
                     matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
 
                     id = refSeq.id
-                    peptideMatch = same
-                    proteinMatch = same
-                    TaxonMatch = different                   
+                    peptideMatch = 1
+                    proteinMatch = 1
+                    TaxonMatch = 0                   
 
                 elif refSeq.seq != peptideProteinSeq and peptideSeq in refSeq.seq:
                     matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
 
                     id = refSeq.id
-                    peptideMatch = same
-                    proteinMatch = different
-                    TaxonMatch = different
+                    peptideMatch = 1
+                    proteinMatch = 0
+                    TaxonMatch = 0
             if peptideMatch == 0 and proteinMatch == 0 and TaxonMatch == 0:
                 pass
             else:
