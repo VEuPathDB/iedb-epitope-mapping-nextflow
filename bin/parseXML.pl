@@ -27,13 +27,14 @@ open(FH, '>>', $outfile) or die $!;
 foreach my $query (@queries) {
 
    my $refName = ($query->findvalue('./Iteration_query-def')); 
+   my $pepLen = ($query->findvalue('./Iteration_query-len')); 
    my @refNameSplit = split / /, $refName;
    my $pepID = $refNameSplit[0];
 
    my @peptideID = ($query->findnodes('./Iteration_hits/Hit')); 
    foreach my $hit (@peptideID) {
         my $name = $hit->findvalue('./Hit_def');
-        my $pepLen = $hit->findvalue('./Hit_len');
+        #my $pepLen = $hit->findvalue('./Hit_len');
         my @Hit_hsps = ($hit->findnodes('./Hit_hsps/Hsp'));
         
         foreach my $hsp (@Hit_hsps) {

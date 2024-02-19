@@ -33,7 +33,7 @@ process fetchTaxon {
 */
 
 process peptideExactMatches {
-    container = 'veupathdb/epitopemapping'
+    //container = 'veupathdb/epitopemapping'
 
     publishDir "${params.results}", mode: 'copy', pattern: "*txt"
 
@@ -102,7 +102,8 @@ process blastSeq {
 */
 
 process processXml {
-    container = 'veupathdb/epitopemapping'
+    //container = 'veupathdb/epitopemapping'
+    container = 'epitopemapping'
 
     input:
       path(xml)
@@ -124,7 +125,7 @@ process processXml {
 */
 
 process mergeResultsFiles {
-    container = 'veupathdb/epitopemapping'
+   // container = 'veupathdb/epitopemapping'
     
     publishDir "${params.results}", mode: 'copy', overwrite: false
 
@@ -163,8 +164,8 @@ workflow epitopesBlast {
 
     processResults = processXml(blastResults.result)
 
-    mergeBlast = processResults.resultFormated.collectFile(name: "mergedOutput.txt", newLine: true )
+    mergeBlast = processResults.resultFormated.collectFile(name: "mergedOutput.txt", newLine: true)
     
-    mergeFiles = mergeResultsFiles(processPeptides.pepResults, mergeBlast,params.peptideMatchBlastCombinedResults)
+    //mergeFiles = mergeResultsFiles(processPeptides.pepResults, mergeBlast,params.peptideMatchBlastCombinedResults)
 
 }

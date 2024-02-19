@@ -36,15 +36,16 @@ sub readExactMatchesAsHash {
         my @counts_list = split("\t", $row);
 
 
-        #TODO:  what is in col 6?
+        #TODO:  what is in col 6? col 6 is the peptide source protein which we do not need (Its different from the reference proteome)
         my $proteinID = $counts_list[0];
-        my $peptideID = $counts_list[5];
+        my $peptideID = $counts_list[6];
         my $pepMatch = $counts_list[1];
         my $proteinMatch = $counts_list[2];
         my $taxonMatch = $counts_list[3];
-        my $alignment = $counts_list[4];
-        my $matchStart = $counts_list[7];
-        my $matchEnd = $counts_list[8];
+        my $pepLen = $counts_list[4];
+        my $alignment = $counts_list[5];
+        my $matchStart = $counts_list[8];
+        my $matchEnd = $counts_list[9];
 
         my $key = $proteinID . "_" . $peptideID;
 
@@ -55,6 +56,7 @@ sub readExactMatchesAsHash {
         $peptideHash{$key}{taxonMatch} = $taxonMatch;
         $peptideHash{$key}{matchStart} = $matchStart;
         $peptideHash{$key}{matchEnd} = $matchEnd;
+        $peptideHash{$key}{pepLen} = $pepLen;
         $peptideHash{$key}{alignment} = $alignment;
     }
 
@@ -63,6 +65,7 @@ sub readExactMatchesAsHash {
     my @colNames = ("pepMatch",
                     "proteinMatch",
                     "taxonMatch",
+                     "pepLen",
                     "matchStart",
                     "matchEnd",
                     "alignment");
@@ -88,7 +91,7 @@ while (my $row = <$blastHandle>) {
     my @peptideExactMatchValues = map { $peptideHashRef->{$key}->{$_} } @$colNames;
 
 
-    print OUT $proteinID . "\t" . $peptideID . "\t" . join("\t", @peptideExactMatchValues) . "\t" . join("\t", @a) . "\n";
+    print OUT $proteinID . "\t" . $peptideID . "\t" . join("\t", @peptideExactMatchValues[0..2]) . "\t". join("\t", @a) . "\n";
 
     $peptideHashRef->{$key}->{foundBlast} = 1;
 }
@@ -102,8 +105,11 @@ foreach my $pepProteinKey (keys %{$peptideHashRef}) {
 
     my @peptideExactMatchValues = map { $peptideHashRef->{$pepProteinKey}->{$_} } @$colNames;
 
-    # we are not writing out empty columns; will this cause problems downstream?
-    print OUT $proteinId . "\t" . $peptideId . "\t" . join("\t", @peptideExactMatchValues) . "\n";
+
+    my $start =  @peptideExactMatchValues[4];
+    my $end =  @peptideExactMatchValues[5];
+    my $seq = @peptideExactMatchValues[6];
+    print OUT $proteinId . "\t" . $peptideId . "\t" . join("\t", @peptideExactMatchValues[0..3]) . "\t". "\t". $start . "\t" . $end . "\t". "\t". "\t". $seq . "\t". $seq . "\t" .$seq . "\n";
 }
 
 

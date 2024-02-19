@@ -106,8 +106,8 @@ def main(argv):
 
                 # TODO: use Seqio to write fasta
                 if iedbTaxon in referenceTaxa:
-                    record = SeqRecord(Seq(peptide), id= peptideId)
-                    SeqIO.write(record)
+                    record = SeqRecord(Seq(peptide), id= peptideId, description="")
+                    SeqIO.write(record, fastaOut, "fasta")
 
                 c1 = Epitope(peptideId, protID, iedbTaxon, peptide, sequence)
                 epitopeDict[peptideId] = c1 
@@ -125,12 +125,15 @@ def main(argv):
             peptideTaxon = epitopeDict[epitopeInstance].peptideTaxon
             proteinID = epitopeDict[epitopeInstance].proteinID
             peptideSeq = epitopeDict[epitopeInstance].peptide
+            pepLen = len(peptideSeq)
 
             peptideMatch = 0
             proteinMatch = 0
             TaxonMatch = 0
-            matchStart = None
-            matchEnd = None
+            matchStart = ''
+            matchEnd = ''
+            id = ''
+            
 
             if peptideTaxon in referenceTaxa:
                 if refSeq.seq == peptideProteinSeq and str(peptideSeq) in refSeq.seq:
@@ -164,8 +167,10 @@ def main(argv):
                     peptideMatch = same
                     proteinMatch = different
                     TaxonMatch = different
-
-            print(f'{id}\t{peptideMatch}\t{proteinMatch}\t{TaxonMatch}\t{peptideSeq}\t{peptideID}\t{proteinID}\t{matchStart}\t{matchEnd}\t{peptideTaxon}', file=outPut)
+            if peptideMatch == 0 and proteinMatch == 0 and TaxonMatch == 0:
+                pass
+            else:
+                print(f'{id}\t{peptideMatch}\t{proteinMatch}\t{TaxonMatch}\t{pepLen}\t{peptideSeq}\t{peptideID}\t{proteinID}\t{matchStart}\t{matchEnd}\t{peptideTaxon}', file=outPut)
     
     outPut.close()
     fastaOut.close()
