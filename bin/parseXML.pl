@@ -34,7 +34,6 @@ foreach my $query (@queries) {
    my @peptideID = ($query->findnodes('./Iteration_hits/Hit')); 
    foreach my $hit (@peptideID) {
         my $name = $hit->findvalue('./Hit_def');
-        #my $pepLen = $hit->findvalue('./Hit_len');
         my @Hit_hsps = ($hit->findnodes('./Hit_hsps/Hsp'));
         
         foreach my $hsp (@Hit_hsps) {
