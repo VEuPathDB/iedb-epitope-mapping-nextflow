@@ -35,8 +35,6 @@ sub readExactMatchesAsHash {
         chomp $row;
         my @counts_list = split("\t", $row);
 
-
-        #TODO:  what is in col 6? col 6 is the peptide source protein which we do not need (Its different from the reference proteome)
         my $proteinID = $counts_list[0];
         my $peptideID = $counts_list[6];
         my $pepMatch = $counts_list[1];
