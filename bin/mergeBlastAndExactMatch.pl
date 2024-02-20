@@ -107,7 +107,7 @@ foreach my $pepProteinKey (keys %{$peptideHashRef}) {
     my $start =  @peptideExactMatchValues[4];
     my $end =  @peptideExactMatchValues[5];
     my $seq = @peptideExactMatchValues[6];
-    print OUT $proteinId . "\t" . $peptideId . "\t" . join("\t", @peptideExactMatchValues[0..3]) . "\t". "\t". $start . "\t" . $end . "\t". "\t". "\t". $seq . "\t". $seq . "\t" .$seq . "\n";
+    print OUT $proteinId . "\t" . $peptideId . "\t" . join("\t", @peptideExactMatchValues[0..3]) . "\t". "\t". "\t". $start . "\t" . $end . "\t". "\t". "\t". $seq . "\t". $seq . "\t" .$seq . "\n";
 }
 
 
