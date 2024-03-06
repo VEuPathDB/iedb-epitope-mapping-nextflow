@@ -126,7 +126,7 @@ process processXml {
 process mergeResultsFiles {
    container = 'veupathdb/epitopemapping'
     
-    publishDir "${params.results}", mode: 'copy', overwrite: false
+    publishDir "${params.results}", mode: 'copy'
 
     input:
       path(exactMatch)
