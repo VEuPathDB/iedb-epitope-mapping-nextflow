@@ -15,7 +15,7 @@ process fetchTaxon {
       val(taxonID)
 
     output:
-      path("TaxaList.txt"), emit: taxaFile
+      path("TaxaList.txt")
 
     script:
       template 'fetchTaxa.bash'
@@ -42,12 +42,10 @@ process peptideExactMatches {
       path(pepProtfasta)
       path(pepTab)
       val(taxon)
-      val(peptideMatchResultsOutput)
-      val(peptidesFilteredBySpeciesFastaOutput)
 
     output:
-      path(peptidesFilteredBySpeciesFastaOutput), emit: peptideFasta
-      path(peptideMatchResultsOutput), emit: pepResults
+      path(params.peptideMatchResults), emit: pepResults
+      path(params.peptidesFilteredBySpeciesFasta), emit: peptideFasta
 
     script:
       template 'ProcessPeptides.bash'
@@ -151,20 +149,22 @@ workflow epitopesBlast {
 
     taxonFile = fetchTaxon(params.taxon)
 
-    database = makeBlastDatabase(refFasta)
+    database = makeBlastDatabase(params.refFasta)
 
-    processPeptides = peptideExactMatches(refFasta, peptidesGeneFasta, peptidesTab, taxonFile.taxaFile, params.peptideMatchResults, params.peptidesFilteredBySpeciesFasta)
-                      
-    peptideFiles =  processPeptides.peptideFasta
-                    .splitFasta(by: params.chuckSize, file:true)
+    // parallel processing starts here
+    // the peptideFasta output here is redundant.  it makes the same filtered epitope file for each process
+    processPeptides = peptideExactMatches(refFasta, peptidesGeneFasta, peptidesTab, taxonFile)
 
-    blastResults = blastSeq(peptideFiles, database.first())
-  
+    peptideSubset = processPeptides.peptideFasta.first().splitFasta( by: params.chuckSize, file: true )
+
+    blastResults = blastSeq(peptideSubset, database)
 
     processResults = processXml(blastResults.result)
 
-    mergeBlast = processResults.resultFormated.collectFile(name: "mergedOutput.txt", newLine: true)
-    
-    mergeFiles = mergeResultsFiles(processPeptides.pepResults, mergeBlast,params.peptideMatchBlastCombinedResults)
+    mergeBlast = processResults.resultFormated.collectFile(name: "mergedBlastOutput.txt", newLine: true)
 
+    mergedPepResults = processPeptides.pepResults.collectFile(name: "mergedPeptideResults.txt", newLine: true)
+
+    // this step merges exact match with blast results
+    mergeFiles = mergeResultsFiles(mergedPepResults, mergeBlast,params.peptideMatchBlastCombinedResults)
 }
