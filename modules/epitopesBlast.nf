@@ -35,8 +35,6 @@ process fetchTaxon {
 process peptideExactMatches {
     container = 'veupathdb/epitopemapping'
 
-    publishDir "${params.results}", mode: 'copy', pattern: "*txt"
-
     input:
       path(refFasta)
       path(pepProtfasta)
@@ -163,7 +161,7 @@ workflow epitopesBlast {
 
     mergeBlast = processResults.resultFormated.collectFile(name: "mergedBlastOutput.txt", newLine: true)
 
-    mergedPepResults = processPeptides.pepResults.collectFile(name: "mergedPeptideResults.txt", newLine: true)
+    mergedPepResults = processPeptides.pepResults.collectFile(name: params.peptideMatchResults, newLine: true, storeDir: "${params.results}" )
 
     // this step merges exact match with blast results
     mergeFiles = mergeResultsFiles(mergedPepResults, mergeBlast,params.peptideMatchBlastCombinedResults)
