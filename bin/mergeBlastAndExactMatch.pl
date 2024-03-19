@@ -93,7 +93,7 @@ while (my $row = <$blastHandle>) {
 
     $peptideHashRef->{$key}->{foundBlast} = 1;
 }
-close $blastHandle;
+
 
 foreach my $pepProteinKey (keys %{$peptideHashRef}) {
     next if($peptideHashRef->{$pepProteinKey}->{foundBlast});
@@ -109,6 +109,6 @@ foreach my $pepProteinKey (keys %{$peptideHashRef}) {
     my $seq = @peptideExactMatchValues[6];
     print OUT $proteinId . "\t" . $peptideId . "\t" . join("\t", @peptideExactMatchValues[0..3]) . "\t". "\t". "\t". $start . "\t" . $end . "\t". "\t". "\t". $seq . "\t". $seq . "\t" .$seq . "\n";
 }
-
+close $blastHandle;
 
 1;
