@@ -36,10 +36,10 @@ include { epitopesBlast } from  './modules/epitopesBlast.nf'
     throw new Exception("Missing parameter params.results")
   } 
 
+refFasta = Channel.fromPath(params.refFasta, checkIfExists:true).splitFasta( by: params.chuckSize, file: true )
 
-refFasta = Channel.fromPath(params.refFasta, checkIfExists: true)
-peptidesTab = Channel.fromPath(params.peptidesTab, checkIfExists: true)
-peptidesGeneFasta = Channel.fromPath(params.peptideGeneFasta, checkIfExists: true)
+peptidesTab = Channel.fromPath(params.peptidesTab, checkIfExists: true).first()
+peptidesGeneFasta = Channel.fromPath(params.peptideGeneFasta, checkIfExists: true).first()
 
 workflow {
     epitopesBlast(refFasta, peptidesTab, peptidesGeneFasta)
