@@ -70,7 +70,7 @@ process makeBlastDatabase {
 }
 
 /*
-* This process runs a blast using the peptide as a query and the database created during makeBlastDatabase().
+* This process runs a blast using the peptide as a query and the database created during makeBlastDatabase(). Only in situation where the peptide source taxon and reference taxon is the same is the blast done
 *
 * @query is the peptide fasta
 * @db the blast database build above 
@@ -92,7 +92,7 @@ process blastSeq {
 }
 
 /*
-* Processes the blast xml output to generate a tabular format/
+* Processes the blast xml output to generate a tabular format. 
 *
 * @xml is the blast xml output file to be used in subsequent steps below
 */
