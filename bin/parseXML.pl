@@ -13,16 +13,13 @@ my ($outputFile);
            ) ;
 die("Please provide both input and out put") unless ($xmlFile & $outputFile);
 
-
 my $xml = XML::LibXML->load_xml(location => $xmlFile);
 
 my @queries = $xml->findnodes('/BlastOutput/BlastOutput_iterations/Iteration');
 
-
 my $outfile = $outputFile;
 
-#FIXME:  should use ">" NOT ">>"
-open(FH, '>>', $outfile) or die $!;
+open(FH, '>', $outfile) or die $!;
 
 foreach my $query (@queries) {
 

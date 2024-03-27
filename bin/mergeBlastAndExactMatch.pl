@@ -11,7 +11,6 @@ my ($peptideMatchFile, $blastFile, $outFile);
             "outputFile=s"=> \$outFile,
     ) ;
 
-
 unless (-e $peptideMatchFile && -e $blastFile && $outFile) {
     &usage("Both input files must exist;  output file must be declared")
 }
@@ -23,12 +22,10 @@ sub usage {
     die $e if($e);
 }
 
-
 sub readExactMatchesAsHash {
     my ($peptideMatchFile) = @_;
 
     open(my $pepHandle, $peptideMatchFile) or die "Could not open file '$peptideMatchFile' $!";
-
 
     my %peptideHash;
     while (my $row = <$pepHandle>) {
@@ -71,12 +68,9 @@ sub readExactMatchesAsHash {
     return \%peptideHash, \@colNames;
 }
 
-
-
 my ($peptideHashRef, $colNames) = &readExactMatchesAsHash($peptideMatchFile);
 
 open(my $blastHandle, $blastFile) or die "Could not open file '$blastFile' $!";
-
 open(OUT, '>', $outFile) or die $!;
 
 while (my $row = <$blastHandle>) {
@@ -88,12 +82,10 @@ while (my $row = <$blastHandle>) {
 
     my @peptideExactMatchValues = map { $peptideHashRef->{$key}->{$_} } @$colNames;
 
-
     print OUT $proteinID . "\t" . $peptideID . "\t" . join("\t", @peptideExactMatchValues[0..2]) . "\t". join("\t", @a) . "\n";
 
     $peptideHashRef->{$key}->{foundBlast} = 1;
 }
-
 
 foreach my $pepProteinKey (keys %{$peptideHashRef}) {
     next if($peptideHashRef->{$pepProteinKey}->{foundBlast});
@@ -102,7 +94,6 @@ foreach my $pepProteinKey (keys %{$peptideHashRef}) {
     my $proteinId = $peptideHashRef->{$pepProteinKey}->{protein};
 
     my @peptideExactMatchValues = map { $peptideHashRef->{$pepProteinKey}->{$_} } @$colNames;
-
 
     my $start =  @peptideExactMatchValues[4];
     my $end =  @peptideExactMatchValues[5];

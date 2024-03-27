@@ -74,7 +74,7 @@ def main(argv):
     fastaOut = open(filteredPeptideFasta, 'w')
     peptideTab = open(epitopetab)
     
-    referenceTaxa = [ ]
+    referenceTaxa = []
 
     try:
         with open(refTaxa) as taxaFile:
@@ -104,7 +104,6 @@ def main(argv):
                 protID = peptidesProperties[0]
                 sequence = pepProtDict.get(protID)
 
-                # TODO: use Seqio to write fasta
                 if iedbTaxon in referenceTaxa:
                     record = SeqRecord(Seq(peptide), id= peptideId, description="")
                     SeqIO.write(record, fastaOut, "fasta")
