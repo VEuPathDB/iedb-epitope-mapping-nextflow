@@ -70,7 +70,7 @@ process makeBlastDatabase {
 }
 
 /*
-* This process runs a blast using the peptide as a query and the database created during makeBlastDatabase().
+* This process runs a blast using the peptide as a query and the database created during makeBlastDatabase(). Only in situation where the peptide source taxon and reference taxon is the same is the blast done
 *
 * @query is the peptide fasta
 * @db the blast database build above 
@@ -92,7 +92,7 @@ process blastSeq {
 }
 
 /*
-* Processes the blast xml output to generate a tabular format/
+* Processes the blast xml output to generate a tabular format
 *
 * @xml is the blast xml output file to be used in subsequent steps below
 */
@@ -153,6 +153,7 @@ workflow epitopesBlast {
     // the peptideFasta output here is redundant.  it makes the same filtered epitope file for each process
     processPeptides = peptideExactMatches(refFasta, peptidesGeneFasta, peptidesTab, taxonFile)
 
+    // Since the peptideFasta is redundant only the first one is used.
     peptideSubset = processPeptides.peptideFasta.first().splitFasta( by: params.chuckSize, file: true )
 
     blastResults = blastSeq(peptideSubset, database)
