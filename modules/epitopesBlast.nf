@@ -22,6 +22,43 @@ process fetchTaxon {
 }
 
 /**
+* Add a step here to download the proteome only in those where the taxon of the iedb is the same as the reference
+*/
+
+process fetchPeptideSourceProteinsIDs {
+   
+   
+   input:
+   path(peptideTabfile)
+   path(childTaxaFile)
+
+   output:
+   path("peptideProteins.txt"), emit: pepSourceProteinIDs
+
+   script:
+    template 'fetchSourceproteins.bash'
+
+}
+
+
+
+process fetchProtein {
+
+    container = 'veupathdb/edirect'
+
+    input:
+     path(proteinID)
+
+    output:
+     path("pepProtein.fasta"), emit: pepProtfasta
+
+    """
+    fileItemString=\$(cat  ${proteinID} | tr "\n" ",")
+    efetch -db protein -id \$fileItemString -format fasta >> pepProtein.fasta
+    sleep 5
+    """
+}
+/**
 * peptideExactMatches takes a reference proteome, peptide source proteome, peptide tab file and a taxon ID to 
 * identity if the reference exactly matches a peptide protein and whether the peptide match and the reference taxon is the same as peptide source taxon.
 * 
@@ -141,17 +178,25 @@ workflow epitopesBlast {
   take: 
     refFasta
     peptidesTab
-    peptidesGeneFasta
+    //peptidesGeneFasta
 
   main:
 
     taxonFile = fetchTaxon(params.taxon)
 
+    peptideProteinsIDs = fetchPeptideSourceProteinsIDs(peptidesTab,taxonFile)
+
+    proteinList = peptideProteinsIDs.pepSourceProteinIDs.splitText( by: 50, file: true)
+
+    peptideProteins = fetchProtein(proteinList)
+
+    mergeProteins = peptideProteins.collectFile(name: "peptidesProteins.fasta", newLine: true).first()
+
     database = makeBlastDatabase(params.refFasta)
 
     // parallel processing starts here
     // the peptideFasta output here is redundant.  it makes the same filtered epitope file for each process
-    processPeptides = peptideExactMatches(refFasta, peptidesGeneFasta, peptidesTab, taxonFile)
+    processPeptides = peptideExactMatches(refFasta, mergeProteins, peptidesTab, taxonFile)
 
     peptideSubset = processPeptides.peptideFasta.first().splitFasta( by: params.chuckSize, file: true )
 
@@ -165,4 +210,5 @@ workflow epitopesBlast {
 
     // this step merges exact match with blast results
     mergeFiles = mergeResultsFiles(mergedPepResults, mergeBlast,params.peptideMatchBlastCombinedResults)
+
 }

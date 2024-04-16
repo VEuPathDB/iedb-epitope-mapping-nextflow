@@ -82,7 +82,9 @@ while (my $row = <$blastHandle>) {
 
     my @peptideExactMatchValues = map { $peptideHashRef->{$key}->{$_} } @$colNames;
 
-    print OUT $proteinID . "\t" . $peptideID . "\t" . join("\t", @peptideExactMatchValues[0..2]) . "\t". join("\t", @a) . "\n";
+    if ($proteinId) {
+        print OUT $proteinID . "\t" . $peptideID . "\t" . join("\t", @peptideExactMatchValues[0..2]) . "\t". join("\t", @a) . "\n";
+    }
 
     $peptideHashRef->{$key}->{foundBlast} = 1;
 }
