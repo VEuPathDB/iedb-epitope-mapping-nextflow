@@ -22,7 +22,10 @@ process fetchTaxon {
 }
 
 /**
-* Add a step here to download the proteome only in those where the taxon of the iedb is the same as the reference
+* Step below process the tab file to get generate list of all peptide protein gene IDs in which the peptide taxa and internal reference taxa is the same. 
+
+* @peptideTabfile: the tab file containing the peptides
+* @childTaxaFile: The taxa file generated from above that contain all the child taxa for the reference being analyzed. 
 */
 
 process fetchPeptideSourceProteinsIDs {
@@ -40,20 +43,24 @@ process fetchPeptideSourceProteinsIDs {
 
 }
 
-
+/*
+* This step download the peptides' source proteins in which their taxa are the same as the our reference spp. 
+*
+* @proteinIDs: the text file containing the list of priotein IDs
+*/
 
 process fetchProtein {
 
     container = 'veupathdb/edirect'
 
     input:
-     path(proteinID)
+     path(proteinIDs)
 
     output:
      path("pepProtein.fasta"), emit: pepProtfasta
 
     """
-    fileItemString=\$(cat  ${proteinID} | tr "\n" ",")
+    fileItemString=\$(cat  ${proteinIDs} | tr "\n" ",")
     efetch -db protein -id \$fileItemString -format fasta >> pepProtein.fasta
     sleep 5
     """
@@ -178,7 +185,6 @@ workflow epitopesBlast {
   take: 
     refFasta
     peptidesTab
-    //peptidesGeneFasta
 
   main:
 
