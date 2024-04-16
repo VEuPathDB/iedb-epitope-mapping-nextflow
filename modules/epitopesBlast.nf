@@ -186,7 +186,7 @@ workflow epitopesBlast {
 
     peptideProteinsIDs = fetchPeptideSourceProteinsIDs(peptidesTab,taxonFile)
 
-    proteinList = peptideProteinsIDs.pepSourceProteinIDs.splitText( by: 50, file: true)
+    proteinList = peptideProteinsIDs.pepSourceProteinIDs.splitText( by: 500, file: true)
 
     peptideProteins = fetchProtein(proteinList)
 
