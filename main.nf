@@ -37,10 +37,9 @@ include { epitopesBlast } from  './modules/epitopesBlast.nf'
 refFasta = Channel.fromPath(params.refFasta, checkIfExists:true).splitFasta( by: params.chuckSize, file: true )
 
 peptidesTab = Channel.fromPath(params.peptidesTab, checkIfExists: true).first()
-//peptidesGeneFasta = Channel.fromPath(params.peptideGeneFasta, checkIfExists: true).first()
 
 workflow {
-    epitopesBlast(refFasta, peptidesTab)//, peptidesGeneFasta)
+    epitopesBlast(refFasta, peptidesTab)
 }
 
 
