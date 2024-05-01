@@ -28,13 +28,13 @@ include { epitopesBlast } from  './modules/epitopesBlast.nf'
     throw new Exception("Missing parameter params.peptideMatchBlastCombinedResults")
   }
   if(!params.chunkSize) {
-    throw new Exception("Missing parameter params.chuckSize")
+    throw new Exception("Missing parameter params.chunkSize")
   } 
   if(!params.results) {
     throw new Exception("Missing parameter params.results")
   } 
 
-refFasta = Channel.fromPath(params.refFasta, checkIfExists:true).splitFasta( by: params.chuckSize, file: true )
+refFasta = Channel.fromPath(params.refFasta, checkIfExists:true).splitFasta( by: params.chunkSize, file: true )
 
 peptidesTab = Channel.fromPath(params.peptidesTab, checkIfExists: true).first()
 
