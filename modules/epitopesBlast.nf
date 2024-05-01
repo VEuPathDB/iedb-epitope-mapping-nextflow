@@ -204,7 +204,7 @@ workflow epitopesBlast {
     // the peptideFasta output here is redundant.  it makes the same filtered epitope file for each process
     processPeptides = peptideExactMatches(refFasta, mergeProteins, peptidesTab, taxonFile)
 
-    peptideSubset = processPeptides.peptideFasta.first().splitFasta( by: params.chuckSize, file: true )
+    peptideSubset = processPeptides.peptideFasta.first().splitFasta( by: params.chunkSize, file: true )
 
     blastResults = blastSeq(peptideSubset, database)
 
