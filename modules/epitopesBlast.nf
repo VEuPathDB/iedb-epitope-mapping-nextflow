@@ -30,6 +30,7 @@ process fetchTaxon {
 
 process fetchPeptideSourceProteinsIDs {
    
+    container = 'veupathdb/epitopemapping'
    
    input:
    path(peptideTabfile)
