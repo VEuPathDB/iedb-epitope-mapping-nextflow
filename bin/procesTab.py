@@ -10,15 +10,18 @@ taxonFH = open(taxonFile)
 
 taxonList = []
 
-for line in taxonFH:
-  taxonList.append(int(line.strip()))
+# for line in taxonFH:
+#   taxonList.append(int(line.strip()))
 
 ncbiDict = {}
 for line in peptideTab:
-  tax = int(line.split("\t")[2])
-  ncbiID = line.split("\t")[0].split('.')[0]
-  if tax in taxonList:
-    ncbiDict[ncbiID] = ncbiID
+    if not line.strip():
+        continue
+    tax = int(line.split("\t")[2])
+    print(tax)
+    ncbiID = line.split("\t")[0].split('.')[0]
+    if tax in taxonList:
+      ncbiDict[ncbiID] = ncbiID
 
 outPut = open("peptideProteins.txt", 'w') 
 for key in ncbiDict:
