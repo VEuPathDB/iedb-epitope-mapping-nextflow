@@ -95,6 +95,8 @@ def main(argv):
     try:
         with open(epitopetab) as pepFile:
             for lines in pepFile:
+                if not lines.strip():
+                    continue
                 line = lines.strip()
                 peptidesProperties = line.split("\t")
 
