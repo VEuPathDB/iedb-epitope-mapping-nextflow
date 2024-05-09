@@ -11,7 +11,6 @@ def getPeptideMatches(peptide, refSeq):
     matchEnd = match.end()
     return(matchStart, matchEnd)
 
-
 class Epitope:
         def __init__(self, peptideID, proteinID, peptideTaxon, peptide, sequence):
             self._peptideID = peptideID
@@ -130,8 +129,7 @@ def main(argv):
             TaxonMatch = 0
             matchStart = ''
             matchEnd = ''
-            id = ''
-            
+            id = ''           
 
             if peptideTaxon in referenceTaxa:
                 if refSeq.seq == peptideProteinSeq and str(peptideSeq) in refSeq.seq:
