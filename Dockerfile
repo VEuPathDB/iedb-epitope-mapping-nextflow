@@ -1,10 +1,8 @@
 FROM python:3.7
 #FROM debian:stretch
 
-
 ENV DEBIAN_FRONTEND=noninteractive
 ENV biopython_version=1.81
-
 
 RUN apt-get update 
 RUN apt-get install -y git ant build-essential wget perl \
@@ -16,6 +14,5 @@ RUN pip install --upgrade pip
 RUN pip install biopython==${biopython_version}
 
 ADD bin/* /usr/bin/
-
 
 WORKDIR /data
