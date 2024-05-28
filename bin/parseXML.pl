@@ -6,6 +6,8 @@ use Data::Dumper;
 use open qw(:std :utf8);
 use Getopt::Long;
 
+## This sctipt perse an xml file from the blast and extract fields needed for the analysis
+
 my ($xmlFile);
 my ($outputFile);
 &GetOptions("inputXml=s"=> \$xmlFile,

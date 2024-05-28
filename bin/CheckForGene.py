@@ -5,6 +5,12 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 import sys, getopt, re
 
+
+# This piece of code check if peptide are present in a given protein, weather it is an exact match, does the peptide source protein (sequence) match a refence protein 
+# and does the peptide source protein Taxon (NCBI) matches a given NCBI taxon.
+
+
+# Function below get the peptide start and end.
 def getPeptideMatches(peptide, refSeq):
     match=re.search(peptide, refSeq)
     matchStart = match.start() + 1
@@ -12,6 +18,10 @@ def getPeptideMatches(peptide, refSeq):
     return(matchStart, matchEnd)
 
 class Epitope:
+        """
+        This class define an epitope instance to contain information about an epitope. It has the iedb epitope ID, protein ID (protein source), 
+        peptide taxon (NCBI taxon of the peptide source protein) and the peptide sequence. 
+        """
         def __init__(self, peptideID, proteinID, peptideTaxon, peptide, sequence):
             self._peptideID = peptideID
             self._proteinID = proteinID

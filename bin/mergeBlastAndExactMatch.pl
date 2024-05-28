@@ -5,6 +5,8 @@ use warnings;
 use Data::Dumper;
 use Getopt::Long;
 
+
+# This code macthes the outputs from the blast and the exact matches into a single text file. 
 my ($peptideMatchFile, $blastFile, $outFile);
 &GetOptions("exactMatchFile=s"=> \$peptideMatchFile,
             "blastFile=s"=> \$blastFile,
