@@ -8,6 +8,22 @@ The Second step uses Blast to identify epitopes hits in the reference proteome. 
 
 The steps in the nextflow graph is shown below. 
 
+
+**<p align=left>Get Started</p>**
+To run the work the following dependencies need to be install
+* Docker
+> `https://docs.docker.com/engine/install/`
+* Nextflow
+> `curl https://get.nextflow.io | bash`
+
+* The pull the git hub repo using the following command
+> `git pull https://github.com/VEuPathDB/iedb-epitope-mapping-nextflow.git`
+
+* Alternatively the workflow can be run directly using nextflow which pull down the repo. 
+> `nextflow run VEuPathDB/iedb-epitope-mapping-nextflow -with-trace -c  <config_file> -r main`
+
+
+
 ***<p align=center>Nextflow workflow</p>*** 
 
 ```mermaid
