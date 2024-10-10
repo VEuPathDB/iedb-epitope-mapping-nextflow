@@ -15,6 +15,7 @@ for line in taxonFH:
 
 ncbiDict = {}
 for line in peptideTab:
+    print(line)
     if not line.strip():
         continue
     tax = int(line.split("\t")[2])
