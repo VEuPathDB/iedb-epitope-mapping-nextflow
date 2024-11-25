@@ -62,7 +62,7 @@ sub readExactMatchesAsHash {
     my @colNames = ("pepMatch",
                     "proteinMatch",
                     "taxonMatch",
-                     "pepLen",
+                    "pepLen",
                     "matchStart",
                     "matchEnd",
                     "alignment");

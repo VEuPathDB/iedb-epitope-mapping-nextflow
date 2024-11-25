@@ -2,6 +2,6 @@
 
 set -euo pipefail
 
-mergeBlastAndExactMatch.pl --exactMatchFile ${exactMatch} \
-                           --blastFile ${balstOutput} \
-                           --outputFile ${peptideMatchBlastCombiedResults}
+mergeBlastAndExactMatch.pl  --exactMatchFile ${exactMatch} \
+                            --blastFile ${balstOutput} \
+                            --outputFile ${peptideMatchBlastCombiedResults}

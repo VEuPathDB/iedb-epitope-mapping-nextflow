@@ -29,17 +29,17 @@ process fetchTaxon {
 */
 
 process fetchPeptideSourceProteinsIDs {
-   
+
     container = 'veupathdb/epitopemapping'
-   
-   input:
-   path(peptideTabfile)
-   path(childTaxaFile)
 
-   output:
-   path("peptideProteins.txt"), emit: pepSourceProteinIDs
+  input:
+  path(peptideTabfile)
+  path(childTaxaFile)
 
-   script:
+  output:
+  path("peptideProteins.txt"), emit: pepSourceProteinIDs
+
+  script:
     template 'fetchSourceproteins.bash'
 
 }
@@ -55,16 +55,16 @@ process fetchProtein {
     container = 'veupathdb/edirect'
 
     input:
-     path(proteinIDs)
+      path(proteinIDs)
 
     output:
-     path("pepProtein.fasta"), emit: pepProtfasta
+      path("pepProtein.fasta"), emit: pepProtfasta
 
-    """
-    fileItemString=\$(cat  ${proteinIDs} | tr "\n" ",")
-    efetch -db protein -id \$fileItemString -format fasta >> pepProtein.fasta
-    sleep 5
-    """
+      """
+      fileItemString=\$(cat  ${proteinIDs} | tr "\n" ",")
+      efetch -db protein -id \$fileItemString -format fasta >> pepProtein.fasta
+      sleep 5
+      """
 }
 /**
 * peptideExactMatches takes a reference proteome, peptide source proteome, peptide tab file and a taxon ID to 
@@ -101,17 +101,17 @@ process peptideExactMatches {
 */
 
 process makeBlastDatabase {
-    container = 'veupathdb/blastsimilarity'
+  container = 'veupathdb/blastsimilarity'
 
-    input:
-      path(fasta)
+  input:
+    path(fasta)
 
-    output:
-      path("db")
+  output:
+    path("db")
 
-    script:
-       sample_base = fasta.getSimpleName()
-       template 'makeBlastDb.bash'
+  script:
+      sample_base = fasta.getSimpleName()
+      template 'makeBlastDb.bash'
 }
 
 /*
@@ -165,7 +165,7 @@ process processXml {
 */
 
 process mergeResultsFiles {
-   container = 'veupathdb/epitopemapping'
+    container = 'veupathdb/epitopemapping'
     
     publishDir "${params.results}", mode: 'copy'
 

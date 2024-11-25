@@ -78,7 +78,7 @@ def main(argv):
             peptideMatchOutput = arg
         elif opt in ("-o", "--filteredPeptideFasta"):
             filteredPeptideFasta = arg
-   
+
     outPut = open(peptideMatchOutput, 'w')
     fastaOut = open(filteredPeptideFasta, 'w')
     peptideTab = open(epitopetab)
@@ -122,7 +122,7 @@ def main(argv):
                 c1 = Epitope(peptideId, protID, iedbTaxon, peptide, sequence)
                 epitopeDict[peptideId] = c1 
     except FileNotFoundError:
-         print(print(f"File {epitopetab} not found!", file=sys.stderr))
+        print(print(f"File {epitopetab} not found!", file=sys.stderr))
 
     for refSeq in SeqIO.parse(refProteome, "fasta"):    
         
@@ -183,4 +183,4 @@ def main(argv):
     peptideTab.close()
 
 if __name__ == "__main__":
-   main(sys.argv[1:])
+    main(sys.argv[1:])

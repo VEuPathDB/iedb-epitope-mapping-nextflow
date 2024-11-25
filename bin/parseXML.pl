@@ -12,7 +12,7 @@ my ($xmlFile);
 my ($outputFile);
 &GetOptions("inputXml=s"=> \$xmlFile,
             "outputFile=s"=> \$outputFile,
-           ) ;
+            ) ;
 die("Please provide both input and out put") unless ($xmlFile & $outputFile);
 
 my $xml = XML::LibXML->load_xml(location => $xmlFile);
@@ -25,13 +25,13 @@ open(FH, '>', $outfile) or die $!;
 
 foreach my $query (@queries) {
 
-   my $refName = ($query->findvalue('./Iteration_query-def')); 
-   my $pepLen = ($query->findvalue('./Iteration_query-len')); 
-   my @refNameSplit = split / /, $refName;
-   my $pepID = $refNameSplit[0];
+    my $refName = ($query->findvalue('./Iteration_query-def')); 
+    my $pepLen = ($query->findvalue('./Iteration_query-len')); 
+    my @refNameSplit = split / /, $refName;
+    my $pepID = $refNameSplit[0];
 
-   my @peptideID = ($query->findnodes('./Iteration_hits/Hit')); 
-   foreach my $hit (@peptideID) {
+    my @peptideID = ($query->findnodes('./Iteration_hits/Hit')); 
+    foreach my $hit (@peptideID) {
         my $name = $hit->findvalue('./Hit_def');
         my @Hit_hsps = ($hit->findnodes('./Hit_hsps/Hsp'));
         
@@ -47,9 +47,9 @@ foreach my $query (@queries) {
             my $alignment = $hsp->findvalue('./Hsp_midline');
             print FH ($name, "\t", $pepID, "\t", $pepLen, "\t", $bitScore, "\t", $evalue, "\t", $hitStart, "\t", $hitEnd, "\t", $hitIdentity, "\t", $aligmentLength, "\t", $querySequence,
             "\t", $hitSequence, "\t", $alignment, "\n");
-           
+
         }
 
-   }
+    }
 
 }
