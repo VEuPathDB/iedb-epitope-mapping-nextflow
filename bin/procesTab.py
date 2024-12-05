@@ -4,37 +4,30 @@ import os
 import sys
 
 file = sys.argv[1]
-peptideTab = open(file)
 taxonFile = sys.argv[2]
+outputFile = sys.argv[3]
+
+peptideTabFh = open(file)
 taxonFH = open(taxonFile)
 
-taxonList = []
+keepTaxa = []
 
 for line in taxonFH:
-  taxonList.append(int(line.strip()))
+  keepTaxa.append(int(line.strip()))
 
-ncbiDict = {}
-for line in peptideTab:
-    print(line)
+outPut = open(outputFile, 'w')
+
+for line in peptideTabFh:
     if not line.strip():
         continue
-    tax = int(line.split("\t")[2])
-    
-    ncbiID = line.split("\t")[0].split('.')[0]
-    if tax in taxonList:
-      ncbiDict[ncbiID] = ncbiID
 
-outPut = open("peptideProteins.txt", 'w') 
-for key in ncbiDict:
-  print(key, file=outPut)
+    splitLine = line.split("\t")
+    iedbTaxId = int(splitLine[2])
 
-peptideTab.close()
+    accessionNumber = splitLine[0].split('.')[0]
+    if iedbTaxId in keepTaxa:
+      print(accessinNumber, file=outPut)
+
+peptideTabFh.close()
 outPut.close()
 
-
-com = """
-  fileItemString=$(cat  peptideProteins.txt | tr "\n" ",")
-  efetch -db protein -id $fileItemString -format fasta >> pepProtein.fasta
-  sleep 5
-"""
-os.system(com)
