@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -euo pipefail
+set uo pipefail
 
 # there are 2 issues with Edirect we solve here
 # 1.  the resulting fasta file has different ids from the input.  we need to add back the orig ids
@@ -8,8 +8,12 @@ set -euo pipefail
 
 # use minus operation on uid and acc to find bad hits
 
-efetch  -db protein -input $proteinIDs -format acc >accessions
-efetch  -db protein -input $proteinIDs -format uid >uids
+grep '^#' -v $proteinIDs >commentsRemoved
+
+set -e
+
+efetch  -db protein -input commentsRemoved -format acc >accessions
+efetch  -db protein -input commentsRemoved -format uid >uids
 
 # empty lines in this file are uids we need to exclude
 awk '/^\$/{print NR}' accessions > empty_line_numbers.txt
@@ -18,7 +22,9 @@ while read line_number; do
     sed -n "\${line_number}p" uids
 done < empty_line_numbers.txt > missingProteinIds
 
-grep -v -f missingProteinIds $proteinIDs > filteredProteinIds.txt
+set +e
+grep -v -f missingProteinIds commentsRemoved > filteredProteinIds.txt
+set -e
 
 efetch -db protein -input filteredProteinIds.txt -format uid >ids.txt
 efetch -db protein -input filteredProteinIds.txt -format fasta >prot.fasta
