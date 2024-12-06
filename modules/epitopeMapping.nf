@@ -41,11 +41,12 @@ process peptideProteinAccessionsFilteredByTaxa {
   path(childTaxaFile)
 
   output:
-  path("filteredPeptideAccessions.txt")
+  path("filteredPeptideAccessions.txt"), emit: accessions
+  path("filteredPeptides.fasta"), emit: peptides
 
   script:
   """
-  peptideProteinAccessionsFilteredByTaxa.py ${peptideTabfile} ${childTaxaFile} allAccessions.tmp
+  peptideProteinAccessionsFilteredByTaxa.py ${peptideTabfile} ${childTaxaFile} allAccessions.tmp filteredPeptides.fasta
   sort -u allAccessions.tmp > filteredPeptideAccessions.txt
   """
 
@@ -154,18 +155,20 @@ process blastSeq {
 * @xml is the blast xml output file to be used in subsequent steps below
 */
 
-process processXml {
+process parseBlastXml {
     container = 'veupathdb/epitopemapping'
 
     input:
       path(xml)
 
     output:
-      path("*txt")
+      path("parsedBlast.txt")
 
     script:
-      sample_base = xml.getName()
-      template 'processBlastXml.bash'
+    """
+    parseXML.pl --inputXml ${xml} \
+                --outputFile parsedBlast.txt
+    """
 }
 
 /*
@@ -190,36 +193,39 @@ process mergeResultsFiles {
       path(params.peptideMatchBlastCombinedResults)
 
     script:
-      template 'mergeFiles.bash'
+    """"
+    mergeBlastAndExactMatch.pl --exactMatchFile ${exactMatch} \
+                               --blastFile ${balstOutput} \
+                               --outputFile ${peptideMatchBlastCombiedResults}
+    """
 }
 
 workflow epitopeMapping {
 
   take: 
-    splitRefFasta
-    peptidesTab
+    splitPeptidesTab
 
   main:
     database = makeBlastDatabase(params.refFasta)
     taxonFile = fetchTaxon(params.taxon)
 
-    peptideProteinAccessions = peptideProteinAccessionsFilteredByTaxa(peptidesTab, taxonFile)
+  peptideProteinAccessions = peptideProteinAccessionsFilteredByTaxa(params.peptidesTab, taxonFile)
 
   // TODO what happens if zero accessions?
-    mergedPeptideProteins = peptideProteinAccessions.splitText( by: 500, file: true)
+    mergedPeptideProteins = peptideProteinAccessions.accessions.splitText( by: 500, file: true)
         | fetchProtein
         | collectFile()
         | first()
 
     // the peptideFasta output here is redundant.  it makes the same filtered epitope file for each process
-    processPeptides = iedbExactMatches(splitRefFasta, mergedPeptideProteins, peptidesTab, taxonFile)
+    processPeptides = iedbExactMatches(params.refFasta, mergedPeptideProteins, splitPeptidesTab, taxonFile)
 
     mergedPepResults = processPeptides.pepResults.collectFile()
 
-    peptideSubset = processPeptides.peptideFasta.first().splitFasta( by: params.chunkSize, file: true )
+    peptideSubset = peptideProteinAccessions.peptides.splitFasta( by: params.chunkSize, file: true )
     mergedBlastResults = blastSeq(peptideSubset, database)
-        | processXml
-        | collectFile(newLine: true)
+         | parseBlastXml
+         | collectFile(newLine: true)
 
 
     // this step merges exact match with blast results
