@@ -4,7 +4,7 @@
 // include the RNA seq workflow
 //---------------------------------------
 
-include { epitopesBlast } from  './modules/epitopesBlast.nf'
+include { epitopeMapping } from  './modules/epitopeMapping.nf'
 
 //======================================
 
@@ -39,7 +39,7 @@ splitRefFasta = Channel.fromPath(params.refFasta, checkIfExists:true).splitFasta
 peptidesTab = Channel.fromPath(params.peptidesTab, checkIfExists: true).first()
 
 workflow {
-    epitopesBlast(splitRefFasta, peptidesTab)
+    epitopeMapping(splitRefFasta, peptidesTab)
 }
 
 

@@ -60,11 +60,11 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv,"hr:e:l:t:p:o:",["refProteome=","epitopeProtein=","epitopetab=", "refTaxa=", "peptideMatchOutput=", "filteredPeptideFasta="])
     except getopt.GetoptError:
-        print ('CheckForGene.py -r <refProteome> -e <epitopeProtein> -l <epitopetab> -t <refTaxa> -p <peptideMatchOutput> -o <filteredPeptideFasta>')   
+        print ('processIedbExactMatches.py -r <refProteome> -e <epitopeProtein> -l <epitopetab> -t <refTaxa> -p <peptideMatchOutput> -o <filteredPeptideFasta>')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print ('CheckForGene.py -r <refProteome> -e <epitopeProtein> -l <epitopetab> -t <refTaxa> -p <peptideMatchOutput> -o <filteredPeptideFasta>')
+            print ('processIedbExactMatches.py -r <refProteome> -e <epitopeProtein> -l <epitopetab> -t <refTaxa> -p <peptideMatchOutput> -o <filteredPeptideFasta>')
             sys.exit()
         elif opt in ("-r", "--refProteome"):
             refProteome = arg
