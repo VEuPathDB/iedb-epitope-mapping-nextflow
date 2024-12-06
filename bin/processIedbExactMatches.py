@@ -76,18 +76,16 @@ def main(argv):
             refTaxa = arg
         elif opt in ("-p", "--peptideMatchOutput"):
             peptideMatchOutput = arg
-        elif opt in ("-o", "--filteredPeptideFasta"):
-            filteredPeptideFasta = arg
 
     outPut = open(peptideMatchOutput, 'w')
-    fastaOut = open(filteredPeptideFasta, 'w')
+
     peptideTab = open(epitopetab)
     
     referenceTaxa = []
     with open(refTaxa) as taxaFile:
         for line in taxaFile:
             currentLine = line.strip()
-            referenceTaxa.append(int(currentLine))
+            referenceTaxa.append(currentLine)
 
 
     pepProtDict = {}
@@ -98,82 +96,49 @@ def main(argv):
     try:
         with open(epitopetab) as pepFile:
             for lines in pepFile:
-                if not lines.strip():
-                    continue
                 line = lines.strip()
                 peptidesProperties = line.split("\t")
 
                 peptideId = peptidesProperties[1]
-                iedbTaxon = int(peptidesProperties[2])
+                iedbTaxon = peptidesProperties[2]
                 peptide = peptidesProperties[3]
                 protID = peptidesProperties[0]
                 sequence = pepProtDict.get(protID)
 
-                if iedbTaxon in referenceTaxa:
-                    record = SeqRecord(Seq(peptide), id= peptideId, description="")
-                    SeqIO.write(record, fastaOut, "fasta")
-
-                c1 = Epitope(peptideId, protID, iedbTaxon, peptide, sequence)
-                epitopeDict[peptideId] = c1 
+                epitopeDict[peptideId] = Epitope(peptideId, protID, iedbTaxon, peptide, sequence)
     except FileNotFoundError:
-        print(print(f"File {epitopetab} not found!", file=sys.stderr))
+        print(f"File {epitopetab} not found!", file=sys.stderr)
 
     for refSeq in SeqIO.parse(refProteome, "fasta"):    
-        
-        for epitopeInstance in epitopeDict: 
-            peptideID = epitopeDict[epitopeInstance].peptideID
-            peptideProteinSeq = epitopeDict[epitopeInstance].sequence
-            peptideTaxon = epitopeDict[epitopeInstance].peptideTaxon
-            proteinID = epitopeDict[epitopeInstance].proteinID
-            peptideSeq = epitopeDict[epitopeInstance].peptide
-            pepLen = len(peptideSeq)
+
+        for epitopeKey in epitopeDict:
+
+            epitope = epitopeDict[epitopeKey]
+
+            pepLen = len(epitope.peptide)
 
             peptideMatch = 0
             proteinMatch = 0
             TaxonMatch = 0
             matchStart = ''
             matchEnd = ''
-            id = ''           
 
-            if peptideTaxon in referenceTaxa:
-                if refSeq.seq == peptideProteinSeq and str(peptideSeq) in refSeq.seq:
-                    matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
+            if epitope.peptideTaxon in referenceTaxa:
+                TaxonMatch = 0
 
-                    id = refSeq.id
-                    peptideMatch = 1
+            if epitope.peptide in refSeq.seq:
+                peptideMatch = 1
+                matchStart, matchEnd = getPeptideMatches(epitope.peptide, str(refSeq.seq))
+                if refSeq.seq == epitope.sequence:
                     proteinMatch = 1
-                    TaxonMatch = 1
 
-                elif refSeq.seq != peptideProteinSeq and peptideSeq in refSeq.seq:
-                    matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
-                    id = refSeq.id
-                    peptideMatch = 1
-                    proteinMatch = 0
-                    TaxonMatch = 1
-
-            else:
-                if refSeq.seq == peptideProteinSeq and peptideSeq in refSeq.seq:
-                    matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
-
-                    id = refSeq.id
-                    peptideMatch = 1
-                    proteinMatch = 1
-                    TaxonMatch = 0                   
-
-                elif refSeq.seq != peptideProteinSeq and peptideSeq in refSeq.seq:
-                    matchStart, matchEnd = getPeptideMatches(str(peptideSeq), str(refSeq.seq))
-
-                    id = refSeq.id
-                    peptideMatch = 1
-                    proteinMatch = 0
-                    TaxonMatch = 0
             if peptideMatch == 0 and proteinMatch == 0 and TaxonMatch == 0:
                 pass
             else:
-                print(f'{id}\t{peptideMatch}\t{proteinMatch}\t{TaxonMatch}\t{pepLen}\t{peptideSeq}\t{peptideID}\t{proteinID}\t{matchStart}\t{matchEnd}\t{peptideTaxon}', file=outPut)
+                print(f'{refSeq.id}\t{peptideMatch}\t{proteinMatch}\t{TaxonMatch}\t{pepLen}\t{epitope.peptide}\t{epitope.peptideID}\t{epitope.proteinID}\t{matchStart}\t{matchEnd}\t{epitope.peptideTaxon}', file=outPut)
     
     outPut.close()
-    fastaOut.close()
+
     peptideTab.close()
 
 if __name__ == "__main__":
