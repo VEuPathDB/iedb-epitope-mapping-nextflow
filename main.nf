@@ -34,12 +34,13 @@ include { epitopeMapping } from  './modules/epitopeMapping.nf'
     throw new Exception("Missing parameter params.results")
   } 
 
-splitRefFasta = Channel.fromPath(params.refFasta, checkIfExists:true).splitFasta( by: params.chunkSize, file: true )
+//splitRefFasta = Channel.fromPath(params.refFasta, checkIfExists:true).splitFasta( by: params.chunkSize, file: true )
 
-peptidesTab = Channel.fromPath(params.peptidesTab, checkIfExists: true).first()
+// process 10,000 epitopes at a time
+peptidesTab = Channel.fromPath(params.peptidesTab, checkIfExists: true).splitText( by: params.peptidesChunkSize, file: true )
 
 workflow {
-    epitopeMapping(splitRefFasta, peptidesTab)
+    epitopeMapping(peptidesTab)
 }
 
 
