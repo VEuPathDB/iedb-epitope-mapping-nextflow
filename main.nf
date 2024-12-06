@@ -18,12 +18,12 @@ include { epitopeMapping } from  './modules/epitopeMapping.nf'
   if(!params.taxon) {
     throw new Exception("Missing parameter params.taxon")
   }
-  if(!params.peptideMatchResults) {
-    throw new Exception("Missing parameter params.peptideMatchResults")
-  }
-  if(!params.peptidesFilteredBySpeciesFasta) {
-    throw new Exception("Missing parameter params.peptidesFilteredBySpeciesFasta")
-  }
+  // if(!params.peptideMatchResults) {
+  //   throw new Exception("Missing parameter params.peptideMatchResults")
+  // }
+  // if(!params.peptidesFilteredBySpeciesFasta) {
+  //   throw new Exception("Missing parameter params.peptidesFilteredBySpeciesFasta")
+  // }
   if(!params.peptideMatchBlastCombinedResults) {
     throw new Exception("Missing parameter params.peptideMatchBlastCombinedResults")
   }
