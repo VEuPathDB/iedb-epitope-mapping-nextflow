@@ -26,7 +26,7 @@ for line in peptideTabFh:
 
     accessionNumber = splitLine[0].split('.')[0]
     if iedbTaxId in keepTaxa:
-      print(accessinNumber, file=outPut)
+      print(accessionNumber, file=outPut)
 
 peptideTabFh.close()
 outPut.close()

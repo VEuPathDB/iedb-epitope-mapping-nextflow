@@ -84,17 +84,11 @@ def main(argv):
     peptideTab = open(epitopetab)
     
     referenceTaxa = []
+    with open(refTaxa) as taxaFile:
+        for line in taxaFile:
+            currentLine = line.strip()
+            referenceTaxa.append(int(currentLine))
 
-    try:
-        with open(refTaxa) as taxaFile:
-            for line in taxaFile:
-        
-                currentLine = line.strip()
-                referenceTaxa.append(int(currentLine))
-    except FileNotFoundError:
-        print(print(f"File {refTaxa} not found!", file=sys.stderr))
-
-    referenceTaxa = set(referenceTaxa)
 
     pepProtDict = {}
     for pepProtSeq in SeqIO.parse(epitopeProtein, "fasta"):

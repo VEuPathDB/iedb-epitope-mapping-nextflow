@@ -2,4 +2,4 @@
 
 set -euo pipefail
 
-procesTab.py ${peptideTabfile} ${childTaxaFile} 
+procesTab.py ${peptideTabfile} ${childTaxaFile}

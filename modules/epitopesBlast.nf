@@ -22,25 +22,27 @@ process fetchTaxon {
 }
 
 /**
-* Step below process the tab file to get generate list of all peptide protein gene IDs in which the peptide taxa and internal reference taxa is the same. 
+*  Filter iedb tab file by a file of taxa ids.  Return the unique set of protein accessions
 
 * @peptideTabfile: the tab file containing the peptides
 * @childTaxaFile: The taxa file generated from above that contain all the child taxa for the reference being analyzed. 
 */
 
-process fetchPeptideSourceProteinsIDs {
-
-    container = 'veupathdb/epitopemapping'
+process peptideProteinAccessionsFilteredByTaxa {
+  container = 'veupathdb/epitopemapping'
 
   input:
   path(peptideTabfile)
   path(childTaxaFile)
 
   output:
-  path("peptideProteins.txt"), emit: pepSourceProteinIDs
+  path("filteredPeptideAccessions.txt")
 
   script:
-    template 'fetchSourceproteins.bash'
+  """
+  peptideProteinAccessionsFilteredByTaxa.py ${peptideTabfile} ${childTaxaFile} allAccessions.tmp
+  sort -u allAccessions.tmp > filteredPeptideAccessions.txt
+  """
 
 }
 
@@ -58,13 +60,12 @@ process fetchProtein {
       path(proteinIDs)
 
     output:
-      path("pepProtein.fasta"), emit: pepProtfasta
+      path("output.fasta")
 
-      """
-      fileItemString=\$(cat  ${proteinIDs} | tr "\n" ",")
-      efetch -db protein -id \$fileItemString -format fasta >> pepProtein.fasta
-      sleep 5
-      """
+
+    script:
+      template 'fetchProteins.bash'
+
 }
 /**
 * peptideExactMatches takes a reference proteome, peptide source proteome, peptide tab file and a taxon ID to 
@@ -91,7 +92,14 @@ process peptideExactMatches {
       path(params.peptidesFilteredBySpeciesFasta), emit: peptideFasta
 
     script:
-      template 'ProcessPeptides.bash'
+    """
+    CheckForGene.py -r ${refFasta} \
+      -l ${pepTab}  \
+      -e ${pepProtfasta} \
+      -t ${taxon} \
+      -p $params.peptideMatchResults \
+      -o $params.peptidesFilteredBySpeciesFasta
+    """
 }
 
 /*
@@ -184,26 +192,23 @@ process mergeResultsFiles {
 workflow epitopesBlast {
 
   take: 
-    refFasta
+    splitRefFasta
     peptidesTab
 
   main:
 
     taxonFile = fetchTaxon(params.taxon)
 
-    peptideProteinsIDs = fetchPeptideSourceProteinsIDs(peptidesTab,taxonFile)
+    peptideProteinAccessions = peptideProteinAccessionsFilteredByTaxa(peptidesTab, taxonFile)
 
-    proteinList = peptideProteinsIDs.pepSourceProteinIDs.splitText( by: 500, file: true)
-
-    peptideProteins = fetchProtein(proteinList)
-
-    mergeProteins = peptideProteins.collectFile(name: "peptidesProteins.fasta", newLine: true).first()
+    mergedPeptideProteins = peptideProteinAccessions.splitText( by: 500, file: true)
+        | fetchProtein
+        | collectFile(newLine: true)
 
     database = makeBlastDatabase(params.refFasta)
 
-    // parallel processing starts here
     // the peptideFasta output here is redundant.  it makes the same filtered epitope file for each process
-    processPeptides = peptideExactMatches(refFasta, mergeProteins, peptidesTab, taxonFile)
+    processPeptides = peptideExactMatches(splitRefFasta, mergedPeptideProteins, peptidesTab, taxonFile)
 
     peptideSubset = processPeptides.peptideFasta.first().splitFasta( by: params.chunkSize, file: true )
 
