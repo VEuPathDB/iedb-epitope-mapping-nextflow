@@ -124,7 +124,7 @@ def main(argv):
             matchEnd = ''
 
             if epitope.peptideTaxon in referenceTaxa:
-                TaxonMatch = 0
+                TaxonMatch = 1
 
             if epitope.peptide in refSeq.seq:
                 peptideMatch = 1
