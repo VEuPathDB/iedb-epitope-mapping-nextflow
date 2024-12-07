@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 
 use strict;
-use warnings;
+
 use Data::Dumper;
 use Getopt::Long;
 
@@ -17,6 +17,17 @@ unless (-e $peptideMatchFile && -e $blastFile && $outFile) {
     &usage("Both input files must exist;  output file must be declared")
 }
 
+
+# NOTE: when joining these 2 files, by proteinSourceId + epitopeId we can first
+# read the blast results into memory.  this is an "outer join" operation.
+# take everything from the exact match file and append the blast data where available
+
+my ($blastHashRef) = &readBlastsAsHash($blastFile);
+
+&readExactMatchesAndPrint($peptideMatchFile, $blastHashRef, $outFile);
+
+
+
 sub usage {
     my ($e) = @_;
 
@@ -24,86 +35,100 @@ sub usage {
     die $e if($e);
 }
 
-sub readExactMatchesAsHash {
-    my ($peptideMatchFile) = @_;
+sub readBlastsAsHash {
+    my ($blastFile) = @_;
+
+    my @columns = ("proteinDefline", "epitopeId", "peptideLength", "bitScore", "evalue", "hitStart", "hitEnd", "hitIdentity", "alignmentLength", "querySequence", "hitSequence", "alignment");
+
+    open(my $blastHandle, $blastFile) or die "Could not open file '$blastFile' $!";
+
+    my %blastHash;
+
+    while (my $row = <$blastHandle>) {
+        chomp $row;
+        next unless $row;
+
+        my @v = split("\t", $row);
+
+        my %hash;
+        @hash{@columns} = @v;
+
+        my $proteinDefline = $hash{proteinDefline};
+
+        if(!$proteinDefline) {
+                    print Dumper \%hash;
+        exit;
+
+        }
+        my ($proteinId) = $proteinDefline =~ /([^\s]+)/;
+
+        my $epitopeId = $hash{epitopeId};
+
+        my $key = $proteinId . "_" . $epitopeId;
+
+        $blastHash{$key} = \%hash;
+    }
+    close $blastHandle;
+
+    return \%blastHash;
+}
+
+
+sub readExactMatchesAndPrint {
+    my ($peptideMatchFile, $blastHashRef, $outFile) = @_;
+
+    open(OUT, '>', $outFile) or die "Cannot open file $outFile for writing:  $!";
 
     open(my $pepHandle, $peptideMatchFile) or die "Could not open file '$peptideMatchFile' $!";
 
-    my %peptideHash;
+    my @columns = ('proteinId', 'peptideMatch', 'proteinMatch', 'taxonMatch', 'peptideLength', 'peptide', 'epitopeId', 'epitopeAccession', 'matchStart', 'matchEnd', 'epitopeTaxon');
+
     while (my $row = <$pepHandle>) {
         chomp $row;
-        my @counts_list = split("\t", $row);
+        next unless $row;
 
-        my $proteinID = $counts_list[0];
-        my $peptideID = $counts_list[6];
-        my $pepMatch = $counts_list[1];
-        my $proteinMatch = $counts_list[2];
-        my $taxonMatch = $counts_list[3];
-        my $pepLen = $counts_list[4];
-        my $alignment = $counts_list[5];
-        my $matchStart = $counts_list[8];
-        my $matchEnd = $counts_list[9];
+        my @v = split("\t", $row);
 
-        my $key = $proteinID . "_" . $peptideID;
+        my %hash;
+        @hash{@columns} = @v;
 
-        $peptideHash{$key}{protein} = $proteinID;
-        $peptideHash{$key}{peptide} = $peptideID;
-        $peptideHash{$key}{pepMatch} = $pepMatch;
-        $peptideHash{$key}{proteinMatch} = $proteinMatch;
-        $peptideHash{$key}{taxonMatch} = $taxonMatch;
-        $peptideHash{$key}{matchStart} = $matchStart;
-        $peptideHash{$key}{matchEnd} = $matchEnd;
-        $peptideHash{$key}{pepLen} = $pepLen;
-        $peptideHash{$key}{alignment} = $alignment;
+        my $proteinId = $hash{proteinId};
+        my $epitopeId = $hash{epitopeId};
+
+        my $key = $proteinId . "_" . $epitopeId;
+
+        my ($hitStart, $hitEnd, $hitIdentity, $alignmentLength, $bitScore, $evalue, $alignment);
+        if($blastHashRef->{$key}) {
+            $hitStart = $blastHashRef->{$key}->{hitStart};
+            $hitEnd = $blastHashRef->{$key}->{hitEnd};
+            $hitIdentity = $blastHashRef->{$key}->{hitIdentity};
+            $alignmentLength = $blastHashRef->{$key}->{alignmentLength};
+            $bitScore = $blastHashRef->{$key}->{bitScore};
+            $evalue = $blastHashRef->{$key}->{evalue};
+            $alignment = $blastHashRef->{$key}->{alignment};
+        }
+
+        print OUT $hash{proteinId}
+            , "\t", $hash{epitopeId}
+            , "\t", $hash{peptideMatch}
+            , "\t", $hash{proteinMatch}
+            , "\t", $hash{taxonMatch}
+            , "\t", $hash{matchStart}
+            , "\t", $hash{matchEnd}
+            , "\t", $hitStart
+            , "\t", $hitEnd
+            , "\t", $hitIdentity
+            , "\t", $alignmentLength
+            , "\t", $bitScore
+            , "\t", $evalue
+            , "\t", $alignment
+            , "\n";
     }
 
     close $pepHandle;
+    close OUT;
 
-    my @colNames = ("pepMatch",
-                    "proteinMatch",
-                    "taxonMatch",
-                    "pepLen",
-                    "matchStart",
-                    "matchEnd",
-                    "alignment");
-
-    return \%peptideHash, \@colNames;
 }
 
-my ($peptideHashRef, $colNames) = &readExactMatchesAsHash($peptideMatchFile);
-
-open(my $blastHandle, $blastFile) or die "Could not open file '$blastFile' $!";
-open(OUT, '>', $outFile) or die $!;
-
-while (my $row = <$blastHandle>) {
-    chomp $row;
-    my @a = split("\t", $row);
-    my $proteinID = shift @a;
-    my $peptideID = shift @a;
-    my $key = $proteinID . "_" . $peptideID;
-
-    my @peptideExactMatchValues = map { $peptideHashRef->{$key}->{$_} } @$colNames;
-
-    if ($peptideID) {
-        print OUT $proteinID . "\t" . $peptideID . "\t" . join("\t", @peptideExactMatchValues[0..2]) . "\t". join("\t", @a) . "\n";
-    }
-
-    $peptideHashRef->{$key}->{foundBlast} = 1;
-}
-
-foreach my $pepProteinKey (keys %{$peptideHashRef}) {
-    next if($peptideHashRef->{$pepProteinKey}->{foundBlast});
-
-    my $peptideID = $peptideHashRef->{$pepProteinKey}->{peptide};
-    my $proteinId = $peptideHashRef->{$pepProteinKey}->{protein};
-
-    my @peptideExactMatchValues = map { $peptideHashRef->{$pepProteinKey}->{$_} } @$colNames;
-
-    my $start =  @peptideExactMatchValues[4];
-    my $end =  @peptideExactMatchValues[5];
-    my $seq = @peptideExactMatchValues[6];
-    print OUT $proteinId . "\t" . $peptideID . "\t" . join("\t", @peptideExactMatchValues[0..3]) . "\t". "\t". "\t". $start . "\t" . $end . "\t". "\t". "\t". $seq . "\t". $seq . "\t" .$seq . "\n";
-}
-close $blastHandle;
 
 1;
