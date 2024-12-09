@@ -1,6 +1,8 @@
 #!/usr/bin/env nextflow
-nextflow.enable.dsl=2 
+nextflow.enable.dsl=2
 
+
+include { pepMatch as smallPepMatch } from  './pepmatch.nf'
 
 /**
 * fetchTaxon takes an NCBI taxon ID and returns all of it child taxa.
@@ -42,11 +44,14 @@ process peptideProteinAccessionsFilteredByTaxa {
 
   output:
   path("filteredPeptideAccessions.txt"), emit: accessions
-  path("filteredPeptides.fasta"), emit: peptides
+  path("taxaFilteredPeptides.fasta"), emit: taxaFilteredPeptidesFasta
+
+  path("smallPeptides.fasta"), emit: smallPeptidesFasta
+  path("notSmallPeptides.fasta"), emit: notSmallPeptidesFasta
 
   script:
   """
-  peptideProteinAccessionsFilteredByTaxa.py ${peptideTabfile} ${childTaxaFile} allAccessions.tmp filteredPeptides.fasta
+  peptideProteinAccessionsFilteredByTaxa.py ${peptideTabfile} ${childTaxaFile} allAccessions.tmp taxaFilteredPeptides.fasta smallPeptides.fasta notSmallPeptides.fasta
   sort -u allAccessions.tmp > filteredPeptideAccessions.txt
   """
 
@@ -77,7 +82,6 @@ process fetchProtein {
 * peptideExactMatches takes a reference proteome, peptide source proteome, peptide tab file and a taxon ID to 
 * identity if the reference exactly matches a peptide protein and whether the peptide match and the reference taxon is the same as peptide source taxon.
 * 
-* If the peptide source taxon and reference taxon are the same, the peptide is added and saved to a fasta file for the blast below. 
 * @refFasta is the reference proteome fasta
 * @pepfasta is the peptide proteome fasta
 * @pepTab is the peptide tab file
@@ -94,7 +98,7 @@ process iedbExactMatches {
       path(taxaFile)
 
     output:
-      path("peptideMatchResults.txt"), emit: pepResults
+      path("peptidesMatchingTaxaResults.txt"), emit: peptidesMatchingTaxaResults
 
     script:
     """
@@ -102,8 +106,7 @@ process iedbExactMatches {
       --epitopetab ${pepTab}  \
       --epitopeProtein ${pepProtfasta} \
       --refTaxa ${taxaFile} \
-      --peptideMatchOutput peptideMatchResults.txt \
-      --filteredPeptideFasta peptidesFilteredBySpecies.fasta
+      --peptideMatchOutput peptidesMatchingTaxaResults.txt \
     """
 }
 
@@ -202,33 +205,31 @@ process mergeResultsFiles {
 
 workflow epitopeMapping {
 
-  take: 
-    splitPeptidesTab
+  // take:
+  //   splitPeptidesTab
 
   main:
     database = makeBlastDatabase(params.refFasta)
     taxonFile = fetchTaxon(params.taxon)
 
-  peptideProteinAccessions = peptideProteinAccessionsFilteredByTaxa(params.peptidesTab, taxonFile)
+    peptideProteinAccessions = peptideProteinAccessionsFilteredByTaxa(params.peptidesTab, taxonFile)
 
-  // TODO what happens if zero accessions?
     mergedPeptideProteins = peptideProteinAccessions.accessions.splitText( by: 500, file: true)
         | fetchProtein
         | collectFile()
         | first()
 
-    // the peptideFasta output here is redundant.  it makes the same filtered epitope file for each process
-    processPeptides = iedbExactMatches(params.refFasta, mergedPeptideProteins, splitPeptidesTab, taxonFile)
+    processPeptides = iedbExactMatches(params.refFasta, mergedPeptideProteins, params.peptidesTab, taxonFile)
 
-    mergedPepResults = processPeptides.pepResults.collectFile()
+    // mergedPepResults = processPeptides.pepResults.collectFile()
 
-    peptideSubset = peptideProteinAccessions.peptides.splitFasta( by: params.chunkSize, file: true )
-    mergedBlastResults = blastSeq(peptideSubset, database)
-         | parseBlastXml
-         | collectFile(newLine: true)
+    // peptideSubset = peptideProteinAccessions.peptides.splitFasta( by: params.chunkSize, file: true )
+    // mergedBlastResults = blastSeq(peptideSubset, database)
+    //      | parseBlastXml
+    //      | collectFile(newLine: true)
 
 
-    // this step merges exact match with blast results
-    mergeFiles = mergeResultsFiles(mergedPepResults, mergedBlastResults, params.peptideMatchBlastCombinedResults)
+    // // this step merges exact match with blast results
+    // mergeFiles = mergeResultsFiles(mergedPepResults, mergedBlastResults, params.peptideMatchBlastCombinedResults)
 
 }

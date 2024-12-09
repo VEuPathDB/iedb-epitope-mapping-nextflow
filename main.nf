@@ -4,7 +4,7 @@
 // include the RNA seq workflow
 //---------------------------------------
 
-include { epitopeMapping } from  './modules/epitopeMapping.nf'
+include { epitopeMapping } from  './workflows/epitopeMapping.nf'
 
 //======================================
 
@@ -37,10 +37,10 @@ include { epitopeMapping } from  './modules/epitopeMapping.nf'
 //splitRefFasta = Channel.fromPath(params.refFasta, checkIfExists:true).splitFasta( by: params.chunkSize, file: true )
 
 // process 10,000 epitopes at a time
-peptidesTab = Channel.fromPath(params.peptidesTab, checkIfExists: true).splitText( by: params.peptidesChunkSize, file: true )
+//peptidesTab = Channel.fromPath(params.peptidesTab, checkIfExists: true).splitText( by: params.peptidesChunkSize, file: true )
 
 workflow {
-    epitopeMapping(peptidesTab)
+    epitopeMapping()
 }
 
 
