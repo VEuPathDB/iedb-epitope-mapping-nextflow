@@ -2,7 +2,9 @@
 nextflow.enable.dsl=2
 
 
-include { pepMatch as smallPepMatch } from  './pepmatch.nf'
+include { pepMatch as smallExactPepMatch } from  '../subworkflows/local/pepmatch.nf'
+include { pepMatch as exactPepMatch } from  '../subworkflows/local/pepmatch.nf'
+include { pepMatch as inexactForTaxaPeptidesPepMatch } from  '../subworkflows/local/pepmatch.nf'
 
 /**
 * fetchTaxon takes an NCBI taxon ID and returns all of it child taxa.
@@ -184,13 +186,13 @@ process parseBlastXml {
 
 process mergeResultsFiles {
     container = 'veupathdb/epitopemapping'
-    
+
     publishDir "${params.results}", mode: 'copy'
 
     input:
       path(exactMatch)
       path(balstOutput)
-      val(peptideMatchBlastCombiedResults) 
+      val(peptideMatchBlastCombiedResults)
 
     output:
       path(params.peptideMatchBlastCombinedResults)
@@ -209,19 +211,23 @@ workflow epitopeMapping {
   //   splitPeptidesTab
 
   main:
-    database = makeBlastDatabase(params.refFasta)
-    taxonFile = fetchTaxon(params.taxon)
+//  database = makeBlastDatabase(params.refFasta)
+  taxonFile = fetchTaxon(params.taxon)
 
-    peptideProteinAccessions = peptideProteinAccessionsFilteredByTaxa(params.peptidesTab, taxonFile)
+  peptideProteinAccessions = peptideProteinAccessionsFilteredByTaxa(params.peptidesTab, taxonFile)
 
-    mergedPeptideProteins = peptideProteinAccessions.accessions.splitText( by: 500, file: true)
-        | fetchProtein
-        | collectFile()
-        | first()
+  // mergedPeptideProteins = peptideProteinAccessions.accessions.splitText( by: 500, file: true)
+  //     | fetchProtein
+  //     | collectFile()
+  //     | first()
 
-    processPeptides = iedbExactMatches(params.refFasta, mergedPeptideProteins, params.peptidesTab, taxonFile)
+//  processPeptides = iedbExactMatches(params.refFasta, mergedPeptideProteins, params.peptidesTab, taxonFile)
 
-    // mergedPepResults = processPeptides.pepResults.collectFile()
+  smallExactPepMatch(peptideProteinAccessions.smallPeptidesFasta, params.refFasta)
+  exactPepMatch(peptideProteinAccessions.notSmallPeptidesFasta.splitFasta( by: 100000, file: true ), params.refFasta)
+  inexactForTaxaPeptidesPepMatch(peptideProteinAccessions.taxaFilteredPeptidesFasta.splitFasta( by: 500, file: true ), params.refFasta)
+
+  // mergedPepResults = processPeptides.pepResults.collectFile()
 
     // peptideSubset = peptideProteinAccessions.peptides.splitFasta( by: params.chunkSize, file: true )
     // mergedBlastResults = blastSeq(peptideSubset, database)

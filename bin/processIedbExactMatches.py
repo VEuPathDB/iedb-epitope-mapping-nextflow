@@ -35,7 +35,7 @@ def main(argv):
 
     outPut = open(peptideMatchOutput, 'w')
 
-    peptideTab = open(epitopetab)
+#    peptideTab = open(epitopetab)
     
     referenceTaxa = []
     with open(refTaxa) as taxaFile:
@@ -83,10 +83,6 @@ def main(argv):
         print(f"File {epitopetab} not found!", file=sys.stderr)
 
     outPut.close()
-    fastaOut.close()
-    smallFastaOut.close()
-
-    peptideTab.close()
 
 if __name__ == "__main__":
     main(sys.argv[1:])

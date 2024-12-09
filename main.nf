@@ -27,9 +27,9 @@ include { epitopeMapping } from  './workflows/epitopeMapping.nf'
   if(!params.peptideMatchBlastCombinedResults) {
     throw new Exception("Missing parameter params.peptideMatchBlastCombinedResults")
   }
-  if(!params.chunkSize) {
-    throw new Exception("Missing parameter params.chunkSize")
-  } 
+  // if(!params.chunkSize) {
+  //   throw new Exception("Missing parameter params.chunkSize")
+  // }
   if(!params.results) {
     throw new Exception("Missing parameter params.results")
   } 
