@@ -38,6 +38,10 @@ def parseFullSeqMatchResults(file):
     with open(file) as fh:
         for line in fh:
             peptide, protein, iedb, taxonMatch, proteinMatch = line.strip().split(",")
+
+            if protein == "":
+                protein = "NA"
+
             key = peptide + "_" + protein;
 
             vals = [taxonMatch, proteinMatch]
@@ -67,13 +71,21 @@ def main(args):
             iedbId = peptideToIedb[peptide]
 
             key = peptide + "_" + trimmedProtein;
+            altKey = peptide + "_NA"
+
             taxonMatch = 0
             fullProteinMatch = 0
-
             if key in fullSeqMatchResults:
-              tm, pm = fullSeqMatchResults[key]
-              taxonMatch = tm
-              fullProteinMatch = pm
+                tm, pm = fullSeqMatchResults[key]
+                taxonMatch = tm
+                fullProteinMatch = pm
+            elif altKey in fullSeqMatchResults:
+                tm, pm = fullSeqMatchResults[altKey]
+                taxonMatch = tm
+                fullProteinMatch = pm
+            else:
+                taxonMatch = 0
+                fullProteinMatch = 0
 
             gffId = trimmedProtein + "_" + start + "_" + end
             attributes = f"ID={gffId};iedb={iedbId};matchesTaxon={taxonMatch};matchesFullLengthProtein={fullProteinMatch};mismatches={mismatches};peptide={peptide}"

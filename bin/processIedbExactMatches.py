@@ -70,14 +70,14 @@ def main(argv):
                 if iedbTaxon in referenceTaxa:
                     TaxonMatch = 1
 
-                    proteinMatch = 0
+                    seenPerfectMatch = False
                     for refSeqId, refSeqSeq in refSeqDict.items():
                         if refSeqSeq == sequence:
-                            proteinMatch = 1
-                            print(f'{peptide},{refSeqId},{peptideId},{TaxonMatch},{proteinMatch}', file=outPut)
+                            seePerfectMatch = True
+                            print(f'{peptide},{refSeqId},{peptideId},{TaxonMatch},1', file=outPut)
 
-                    if proteinMatch == 0:
-                        print(f'{peptide},{refSeqId},{peptideId},{TaxonMatch},{proteinMatch}', file=outPut)
+                    if seenPerfectMatch is False:
+                        print(f'{peptide},,{peptideId},{TaxonMatch},0', file=outPut)
 
     except FileNotFoundError:
         print(f"File {epitopetab} not found!", file=sys.stderr)
