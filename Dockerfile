@@ -13,6 +13,8 @@ RUN pip install --upgrade pip
 
 RUN pip install biopython==${biopython_version}
 
+RUN pip install pepmatch==1.0.5
+
 ADD bin/* /usr/bin/
 
 WORKDIR /data
