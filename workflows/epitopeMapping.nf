@@ -132,18 +132,39 @@ process mergeResultsFiles {
   path(pepTab)
 
   output:
-  path(params.peptideMatchResults)
+  path("merged.gff")
 
   script:
   """
   cut -f 1 -d ',' $pepMatchResults $fullSeqMatchResults | sort -u >distinctPeptides
-  mergeResults.pl --pepMatchResults ${pepMatchResults} \
+  mergeResults.py --pepMatchResults ${pepMatchResults} \
     --fullSeqMatchResults ${fullSeqMatchResults} \
     --peptideTab ${pepTab} \
     --distinctPeptides distinctPeptides \
-    --outputFile ${params.peptideMatchResults}
+    --outputFile merged.gff
   """
 }
+
+process indexResults {
+  container = 'biocontainers/tabix:v1.9-11-deb_cv1'
+  publishDir params.results, mode: 'copy'
+
+  input:
+    path gff
+    val outputFileName
+
+  output:
+    path '*.gff.gz'
+    path '*.tbi'
+
+  script:
+  """
+  sort -k1,1 -k4,4n $gff > $outputFileName
+  bgzip $outputFileName
+  tabix -p gff ${outputFileName}.gz
+  """
+}
+
 
 workflow epitopeMapping {
 
@@ -166,5 +187,7 @@ workflow epitopeMapping {
 
   pepMatchResults = taxaMatch.mix(otherMatch, smallMatch).collectFile()
 
-  mergeResultsFiles(pepMatchResults, taxaAndFullSequenceResults, params.peptidesTab)
+  gff = mergeResultsFiles(pepMatchResults, taxaAndFullSequenceResults, params.peptidesTab)
+
+  indexResults(gff, params.peptideMatchResults)
 }

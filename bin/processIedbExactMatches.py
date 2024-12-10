@@ -37,11 +37,11 @@ def main(argv):
 
 #    peptideTab = open(epitopetab)
     
-    referenceTaxa = []
+    referenceTaxa = {}
     with open(refTaxa) as taxaFile:
         for line in taxaFile:
             currentLine = line.strip()
-            referenceTaxa.append(currentLine)
+            referenceTaxa[currentLine] = 1
 
 
     pepProtDict = {}

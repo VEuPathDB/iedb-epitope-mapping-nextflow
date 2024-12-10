@@ -24,8 +24,8 @@ include { epitopeMapping } from  './workflows/epitopeMapping.nf'
   // if(!params.peptidesFilteredBySpeciesFasta) {
   //   throw new Exception("Missing parameter params.peptidesFilteredBySpeciesFasta")
   // }
-  if(!params.peptideMatchBlastCombinedResults) {
-    throw new Exception("Missing parameter params.peptideMatchBlastCombinedResults")
+  if(!params.peptideMatchResults) {
+    throw new Exception("Missing parameter params.peptideMatchResults")
   }
   // if(!params.chunkSize) {
   //   throw new Exception("Missing parameter params.chunkSize")
