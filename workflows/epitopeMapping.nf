@@ -47,13 +47,12 @@ process peptideProteinAccessionsFilteredByTaxa {
   output:
   path("filteredPeptideAccessions.txt"), emit: accessions
   path("taxaFilteredPeptides.fasta"), emit: taxaFilteredPeptidesFasta
-
   path("smallPeptides.fasta"), emit: smallPeptidesFasta
-  path("notSmallPeptides.fasta"), emit: notSmallPeptidesFasta
+  path("otherPeptides.fasta"), emit: otherPeptidesFasta
 
   script:
   """
-  peptideProteinAccessionsFilteredByTaxa.py ${peptideTabfile} ${childTaxaFile} allAccessions.tmp taxaFilteredPeptides.fasta smallPeptides.fasta notSmallPeptides.fasta
+  peptideProteinAccessionsFilteredByTaxa.py ${peptideTabfile} ${childTaxaFile} allAccessions.tmp taxaFilteredPeptides.fasta smallPeptides.fasta otherPeptides.fasta
   sort -u allAccessions.tmp > filteredPeptideAccessions.txt
   """
 
@@ -100,7 +99,7 @@ process iedbExactMatches {
       path(taxaFile)
 
     output:
-      path("peptidesMatchingTaxaResults.txt"), emit: peptidesMatchingTaxaResults
+      path("peptidesMatchingTaxaResults.txt"), emit: peptidesMatchingTaxaAndFullSequence
 
     script:
     """
@@ -112,69 +111,7 @@ process iedbExactMatches {
     """
 }
 
-/*
-* Makes a blast database using the reference proteome.
-*
-* @fasta is the input proteome.
-*/
 
-process makeBlastDatabase {
-  container = 'veupathdb/blastsimilarity'
-
-  input:
-    path(fasta)
-
-  output:
-    path("db")
-
-  script:
-      sample_base = fasta.getSimpleName()
-      template 'makeBlastDb.bash'
-}
-
-/*
-* This process runs a blast using the peptide as a query and the database created during makeBlastDatabase(). Only in situation where the peptide source taxon and reference taxon is the same is the blast done
-*
-* @query is the peptide fasta
-* @db the blast database build above 
-*/
-
-process blastSeq {
-    container = 'veupathdb/blastsimilarity'
-
-    input:
-      path(query)
-      path(db)
-
-    output:
-      path("${sample_base}*xml")
-
-    script:
-      sample_base = query.getName()
-      template 'BlastSeq.bash'
-}
-
-/*
-* Processes the blast xml output to generate a tabular format. 
-*
-* @xml is the blast xml output file to be used in subsequent steps below
-*/
-
-process parseBlastXml {
-    container = 'veupathdb/epitopemapping'
-
-    input:
-      path(xml)
-
-    output:
-      path("parsedBlast.txt")
-
-    script:
-    """
-    parseXML.pl --inputXml ${xml} \
-                --outputFile parsedBlast.txt
-    """
-}
 
 /*
 * Merges the exact match searches and the blast out to generate one file as output. 
@@ -211,20 +148,20 @@ workflow epitopeMapping {
   //   splitPeptidesTab
 
   main:
-//  database = makeBlastDatabase(params.refFasta)
+
   taxonFile = fetchTaxon(params.taxon)
 
   peptideProteinAccessions = peptideProteinAccessionsFilteredByTaxa(params.peptidesTab, taxonFile)
 
-  // mergedPeptideProteins = peptideProteinAccessions.accessions.splitText( by: 500, file: true)
-  //     | fetchProtein
-  //     | collectFile()
-  //     | first()
+  mergedPeptideProteins = peptideProteinAccessions.accessions.splitText( by: 500, file: true)
+      | fetchProtein
+      | collectFile()
+      | first()
 
-//  processPeptides = iedbExactMatches(params.refFasta, mergedPeptideProteins, params.peptidesTab, taxonFile)
+  processPeptides = iedbExactMatches(params.refFasta, mergedPeptideProteins, params.peptidesTab, taxonFile)
 
   smallExactPepMatch(peptideProteinAccessions.smallPeptidesFasta, params.refFasta)
-  exactPepMatch(peptideProteinAccessions.notSmallPeptidesFasta.splitFasta( by: 100000, file: true ), params.refFasta)
+  exactPepMatch(peptideProteinAccessions.otherPeptidesFasta.splitFasta( by: 100000, file: true ), params.refFasta)
   inexactForTaxaPeptidesPepMatch(peptideProteinAccessions.taxaFilteredPeptidesFasta.splitFasta( by: 500, file: true ), params.refFasta)
 
   // mergedPepResults = processPeptides.pepResults.collectFile()

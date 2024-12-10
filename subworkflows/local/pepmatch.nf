@@ -34,6 +34,22 @@ process match {
 }
 
 
+process filterResults {
+    container = 'jbrestel/iedb'
+
+    input:
+    path(csv)
+
+    output:
+    path("filtered.csv"), emit: csv
+
+    script:
+    """
+    awk -F, 'NR > 1 && \$2 != "" { OFS=","; print \$1, \$3, \$8, \$10, \$11 }' $csv > filtered.csv
+    """
+
+}
+
 workflow pepMatch {
     take:
     peptideFasta
@@ -42,7 +58,8 @@ workflow pepMatch {
     main:
     preprocess(proteomeFasta)
     pepMatchResults = match(peptideFasta, preprocess.out)
+    filteredResults = filterResults(pepMatchResults.csv)
 
     emit:
-    pepMatchResults.csv
+    filteredResults.csv
 }
