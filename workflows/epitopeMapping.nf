@@ -141,6 +141,7 @@ process mergeResultsFiles {
     --fullSeqMatchResults ${fullSeqMatchResults} \
     --peptideTab ${pepTab} \
     --distinctPeptides distinctPeptides \
+    --nonTaxaShortPeptideCutoff ${params.nonTaxaShortPeptideCutoff} \
     --outputFile merged.gff
   """
 }

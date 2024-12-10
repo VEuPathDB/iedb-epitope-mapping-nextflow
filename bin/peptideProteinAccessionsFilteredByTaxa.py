@@ -3,6 +3,9 @@
 import os
 import sys
 
+# short peptides need different pepMatch preprocessing (kmer=2)
+shortPeptideCutoff = 5
+
 file = sys.argv[1]
 taxonFile = sys.argv[2]
 outputFile = sys.argv[3]
@@ -38,7 +41,7 @@ for line in peptideTabFh:
     epitopeId = splitLine[1]
     peptide = splitLine[3]
 
-    if len(peptide) < 5:
+    if len(peptide) < shortPeptideCutoff:
       print(f'>{epitopeId}\n{peptide}', file=smallFastaOut)
     elif iedbTaxId in keepTaxa:
       print(accessionNumber, file=outPut)

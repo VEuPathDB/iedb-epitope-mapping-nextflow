@@ -9,6 +9,7 @@ def parseArguments():
     parser.add_argument("--peptideTab", required=True, help="Path to peptide tab file")
     parser.add_argument("--outputFile", required=True, help="Path to output file")
     parser.add_argument("--distinctPeptides", required=True, help="Path to distinct peptides file")
+    parser.add_argument("--nonTaxaShortPeptideCutoff", required=True, help="Peptides less than this length from other taxa will not be output")
     return parser.parse_args()
 
 def parseDistinctPeptides(file):
@@ -53,6 +54,9 @@ def main(args):
 
     gffSource = "veupathdb"
     gffType = "peptide"
+
+    nonTaxaShortPeptideCutoff = int(args.nonTaxaShortPeptideCutoff)
+
     distinctPeptides = parseDistinctPeptides(args.distinctPeptides)
     peptideToIedb = parsePeptideToIedb(args.peptideTab, distinctPeptides)
     fullSeqMatchResults = parseFullSeqMatchResults(args.fullSeqMatchResults)
@@ -92,7 +96,8 @@ def main(args):
 
             gffRow = f"{trimmedProtein}\t{gffSource}\t{gffType}\t{start}\t{end}\t.\t.\t.\t{attributes}"
 
-            print(gffRow, file=out)
+            if not (taxonMatch != 1 and len(peptide) < nonTaxaShortPeptideCutoff):
+                print(gffRow, file=out)
 
     fh.close()
 
