@@ -2,8 +2,8 @@
 nextflow.enable.dsl=2
 
 process preprocess {
-//    container = 'veupathdb/epitopemapping'
-    container = 'jbrestel/iedb'
+    container = 'veupathdb/epitopemapping'
+
     input:
     path(fasta)
 
@@ -17,8 +17,7 @@ process preprocess {
 }
 
 process match {
-    //container = 'veupathdb/epitopemapping'
-    container = 'jbrestel/iedb'
+    container = 'veupathdb/epitopemapping'
 
     input:
     path(queryFasta)
@@ -35,7 +34,7 @@ process match {
 
 
 process filterResults {
-    container = 'jbrestel/iedb'
+    container = 'veupathdb/epitopemapping'
 
     input:
     path(csv)

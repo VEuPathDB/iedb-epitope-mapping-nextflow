@@ -74,10 +74,10 @@ def main(argv):
                     for refSeqId, refSeqSeq in refSeqDict.items():
                         if refSeqSeq == sequence:
                             proteinMatch = 1
-                            print(f'{refSeqId}\t{peptide}\t{peptideId}\t{TaxonMatch}\t{proteinMatch}', file=outPut)
+                            print(f'{peptide},{refSeqId},{peptideId},{TaxonMatch},{proteinMatch}', file=outPut)
 
                     if proteinMatch == 0:
-                        print(f'{refSeqId}\t{peptide}\t{peptideId}\t{TaxonMatch}\t{proteinMatch}', file=outPut)
+                        print(f'{peptide},{refSeqId},{peptideId},{TaxonMatch},{proteinMatch}', file=outPut)
 
     except FileNotFoundError:
         print(f"File {epitopetab} not found!", file=sys.stderr)
