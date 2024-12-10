@@ -4,7 +4,7 @@
 // include the RNA seq workflow
 //---------------------------------------
 
-include { epitopesBlast } from  './modules/epitopesBlast.nf'
+include { epitopeMapping } from  './workflows/epitopeMapping.nf'
 
 //======================================
 
@@ -18,28 +18,29 @@ include { epitopesBlast } from  './modules/epitopesBlast.nf'
   if(!params.taxon) {
     throw new Exception("Missing parameter params.taxon")
   }
+  // if(!params.peptideMatchResults) {
+  //   throw new Exception("Missing parameter params.peptideMatchResults")
+  // }
+  // if(!params.peptidesFilteredBySpeciesFasta) {
+  //   throw new Exception("Missing parameter params.peptidesFilteredBySpeciesFasta")
+  // }
   if(!params.peptideMatchResults) {
     throw new Exception("Missing parameter params.peptideMatchResults")
   }
-  if(!params.peptidesFilteredBySpeciesFasta) {
-    throw new Exception("Missing parameter params.peptidesFilteredBySpeciesFasta")
-  }
-  if(!params.peptideMatchBlastCombinedResults) {
-    throw new Exception("Missing parameter params.peptideMatchBlastCombinedResults")
-  }
-  if(!params.chunkSize) {
-    throw new Exception("Missing parameter params.chunkSize")
-  } 
+  // if(!params.chunkSize) {
+  //   throw new Exception("Missing parameter params.chunkSize")
+  // }
   if(!params.results) {
     throw new Exception("Missing parameter params.results")
   } 
 
-refFasta = Channel.fromPath(params.refFasta, checkIfExists:true).splitFasta( by: params.chunkSize, file: true )
+//splitRefFasta = Channel.fromPath(params.refFasta, checkIfExists:true).splitFasta( by: params.chunkSize, file: true )
 
-peptidesTab = Channel.fromPath(params.peptidesTab, checkIfExists: true).first()
+// process 10,000 epitopes at a time
+//peptidesTab = Channel.fromPath(params.peptidesTab, checkIfExists: true).splitText( by: params.peptidesChunkSize, file: true )
 
 workflow {
-    epitopesBlast(refFasta, peptidesTab)
+    epitopeMapping()
 }
 
 
