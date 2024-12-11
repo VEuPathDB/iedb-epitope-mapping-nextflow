@@ -160,7 +160,7 @@ process indexResults {
 
   script:
   """
-  sort -k1,1 -k4,4n $gff > $outputFileName
+  sort -u -k1,1 -k4,4n $gff > $outputFileName
   bgzip $outputFileName
   tabix -p gff ${outputFileName}.gz
   """

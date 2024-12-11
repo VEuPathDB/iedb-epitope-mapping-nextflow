@@ -45,7 +45,7 @@ for line in peptideTabFh:
       print(f'>{epitopeId}\n{peptide}', file=smallFastaOut)
     elif iedbTaxId in keepTaxa:
       print(accessionNumber, file=outPut)
-      print(f">{splitLine[1]}\n{splitLine[3]}", file=pepMatchTaxaOutputFasta)
+      print(f">{epitopeId}\n{peptide}", file=pepMatchTaxaOutputFasta)
     else:
       print(f'>{epitopeId}\n{peptide}', file=otherFastaOut)
 

@@ -30,7 +30,8 @@ def parsePeptideToIedb(file, keep):
 
             if peptide in keep:
                 iedbId = fields[1]
-                rv[peptide] = iedbId
+
+                rv.setdefault(peptide, []).append(iedbId)
     fh.close()
     return(rv)
 
@@ -71,9 +72,6 @@ def main(args):
             # pepMatch preprocess db adds a ".1 suffix to proteins; remove it
             trimmedProtein = re.sub(removeSuffixPattern, "", protein)
 
-            # this will throw KeyError exception if not found
-            iedbId = peptideToIedb[peptide]
-
             key = peptide + "_" + trimmedProtein;
             altKey = peptide + "_NA"
 
@@ -91,13 +89,20 @@ def main(args):
                 taxonMatch = 0
                 fullProteinMatch = 0
 
-            gffId = trimmedProtein + "_" + start + "_" + end
-            attributes = f"ID={gffId};iedb={iedbId};matchesTaxon={taxonMatch};matchesFullLengthProtein={fullProteinMatch};mismatches={mismatches};peptide={peptide}"
+            iedbCount = 0;
+            for iedbId in peptideToIedb.get(peptide, []):
+                iedbCount = iedbCount + 1
 
-            gffRow = f"{trimmedProtein}\t{gffSource}\t{gffType}\t{start}\t{end}\t.\t.\t.\t{attributes}"
+                gffId = trimmedProtein + "_" + iedbId + "_" + start + "_" + end
+                attributes = f"ID={gffId};iedb={iedbId};matchesTaxon={taxonMatch};matchesFullLengthProtein={fullProteinMatch};mismatches={mismatches};peptide={peptide}"
 
-            if not (taxonMatch != 1 and len(peptide) < nonTaxaShortPeptideCutoff):
-                print(gffRow, file=out)
+                gffRow = f"{trimmedProtein}\t{gffSource}\t{gffType}\t{start}\t{end}\t.\t.\t.\t{attributes}"
+
+                if not (taxonMatch != 1 and len(peptide) < nonTaxaShortPeptideCutoff):
+                    print(gffRow, file=out)
+
+            if iedbCount < 1:
+                raise ValueError("Unable to find iedb id for peptide:  " + peptide)
 
     fh.close()
 
