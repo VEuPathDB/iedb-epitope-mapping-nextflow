@@ -124,8 +124,6 @@ process iedbExactMatches {
 process mergeResultsFiles {
   container = 'veupathdb/epitopemapping'
 
-  publishDir "${params.results}", mode: 'copy'
-
   input:
   path(pepMatchResults)
   path(fullSeqMatchResults)
