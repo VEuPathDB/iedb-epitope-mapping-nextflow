@@ -44,7 +44,7 @@ def parseFullSeqMatchResults(file):
             if protein == "":
                 protein = "NA"
 
-            key = peptide + "_" + protein;
+            key = peptide + "_" + protein
 
             vals = [taxonMatch, proteinMatch]
             rv[key] = vals
@@ -72,7 +72,7 @@ def main(args):
             # pepMatch preprocess db adds a ".1 suffix to proteins; remove it
             trimmedProtein = re.sub(removeSuffixPattern, "", protein)
 
-            key = peptide + "_" + trimmedProtein;
+            key = peptide + "_" + trimmedProtein
             altKey = peptide + "_NA"
 
             taxonMatch = 0
@@ -89,7 +89,7 @@ def main(args):
                 taxonMatch = 0
                 fullProteinMatch = 0
 
-            iedbCount = 0;
+            iedbCount = 0
             for iedbId in peptideToIedb.get(peptide, []):
                 iedbCount = iedbCount + 1
 
