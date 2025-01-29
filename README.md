@@ -6,3 +6,16 @@ The analysis begin with processing of the epitopes taking a tab file containing 
 
 iedb PEPMatch (https://github.com/IEDB/PEPMatch) is used for peptide matching.
 
+
+**<p align=left>Get Started</p>**
+To run the work the following dependencies need to be downloaded and installed. 
+
+* Docker 
+> `https://docs.docker.com/engine/install/`
+* Nextflow
+> `curl https://get.nextflow.io | bash`
+
+* Pull the GitHub with the command below
+> `git pull https://github.com/VEuPathDB/antismash-nextflow.git`
+* Alternatively the workflow can be run directly from the online which pull the repo and run it.
+> `nextflow run VEuPathDB/antismash-nextflow -with-trace -c <config_file> -r main`
