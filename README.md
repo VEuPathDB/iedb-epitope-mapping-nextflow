@@ -17,5 +17,8 @@ To run the work the following dependencies need to be downloaded and installed.
 
 * Pull the GitHub with the command below
 > `git pull https://github.com/VEuPathDB/antismash-nextflow.git`
+    Then do > `nextflow run main.nf`  
+
 * Alternatively the workflow can be run directly from the online which pull the repo and run it.
 > `nextflow run VEuPathDB/antismash-nextflow -with-trace -c <config_file> -r main`
+The `-c <config_file>` is the nextflow.config file, an example can found in the repo directory
