@@ -23,6 +23,14 @@ To run the work the following dependencies need to be downloaded and installed.
 > `nextflow run VEuPathDB/antismash-nextflow -with-trace -c <config_file> -r main`
 The `-c <config_file>` is the nextflow.config file, an example can found in the repo directory
 
+**<p align=left>Input Data</p>**
+Example of input data can be found in the `data` directory with following required files
+* An epitope tab file containing the short epitope sequence from IEDB. See example in data/epitopes.tab
+* A file containing sequences for peptide source proteins. See example in data/peroepitopesGenpept.fasta
+
+**<p align=left>Output Data</p>**
+The output of the workflow is an indexfile containing the location of the match peptide, indicating if they are exact matches, match the taxon, and the reference source protein. An example can be found in the output folder. 
+
 
 ***<p align=center>Nextflow workflow diagram</p>*** 
 ``` mermaid
