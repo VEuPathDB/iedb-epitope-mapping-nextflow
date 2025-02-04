@@ -35,7 +35,6 @@ def main(argv):
 
     outPut = open(peptideMatchOutput, 'w')
 
-#    peptideTab = open(epitopetab)
     
     referenceTaxa = {}
     with open(refTaxa) as taxaFile:
