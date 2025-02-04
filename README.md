@@ -1,8 +1,8 @@
 # Immune Epitope analyses
-This repository contains scripts and processes for the identification of genes whose protein products contains epitope sequences identified by  Immune Epitope Database and Analysis Resource (IEDB).
+This repository contains scripts and processes for the identification of genes whose protein products contains Epitope sequences identified by  Immune Epitope Database and Analysis Resource (IEDB).
 
 
-The analysis begin with processing of the epitopes taking a tab file containing the epitopes and reference proteome.  We divide the peptides into 3 categories:  very small peptides which require separate preprocessing of the reference genome, peptides annotated as matching the input taxon which we will allow up to one mismatch in the alignment, and the rest which we will do exact matching.  We also retrieve the original protein sequences from genbank for those peptides which match the input taxon.  Full peptide sequence are also matched against the reference proteome.
+The analysis begin with processing of the epitopes taking a tab file containing the epitopes and reference proteome.  We divide the peptides into 3 categories:  very small peptides which require separate preprocessing of the reference genome, peptides annotated as matching the input taxon which we will allow up to one mismatch in the alignment, and the rest which we will do exact matching.  We also retrieve the original protein sequences from GenBank for those peptides which match the input taxon.  Full peptide sequence are also matched against the reference proteome.
 
 iedb PEPMatch (https://github.com/IEDB/PEPMatch) is used for peptide matching.
 
@@ -25,7 +25,7 @@ The `-c <config_file>` is the nextflow.config file, an example can found in the 
 
 **<p align=left>Input Data</p>**
 Example of input data can be found in the `data` directory with following required files
-* An epitope tab file containing the short epitope sequence from IEDB. See example in data/epitopes.tab
+* An Epitope tab file containing the short Epitope sequence from IEDB. See example in data/epitopes.tab
 * A file containing sequences for peptide source proteins. See example in data/peroepitopesGenpept.fasta
 
 **<p align=left>Output Data</p>**
