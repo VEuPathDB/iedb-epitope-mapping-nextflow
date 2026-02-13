@@ -13,7 +13,7 @@ include { pepMatch as inexactForTaxaPeptidesPepMatch } from  '../subworkflows/lo
 */
 
 process fetchTaxon {
-    container = 'veupathdb/edirect:1.0.0'
+    container 'veupathdb/edirect:1.0.0'
     
     input:
       val(taxonID)
@@ -38,7 +38,7 @@ process fetchTaxon {
 */
 
 process peptideProteinAccessionsFilteredByTaxa {
-  container = 'veupathdb/epitopemapping:1.0.0'
+  container 'veupathdb/epitopemapping:1.0.0'
 
   input:
   path(peptideTabfile)
@@ -66,7 +66,7 @@ process peptideProteinAccessionsFilteredByTaxa {
 
 process fetchProtein {
 
-    container = 'veupathdb/edirect:1.0.0'
+    container 'veupathdb/edirect:1.0.0'
 
     input:
       path(proteinIDs)
@@ -90,7 +90,7 @@ process fetchProtein {
 */
 
 process iedbExactMatches {
-    container = 'veupathdb/epitopemapping:1.0.0'
+    container 'veupathdb/epitopemapping:1.0.0'
 
     input:
       path(refFasta)
@@ -122,7 +122,7 @@ process iedbExactMatches {
 */
 
 process mergeResultsFiles {
-  container = 'veupathdb/epitopemapping:1.0.0'
+  container 'veupathdb/epitopemapping:1.0.0'
 
   input:
   path(pepMatchResults)
@@ -145,7 +145,7 @@ process mergeResultsFiles {
 }
 
 process indexResults {
-  container = 'biocontainers/tabix:v1.9-11-deb_cv1'
+  container 'biocontainers/tabix:v1.9-11-deb_cv1'
   publishDir params.results, mode: 'copy'
 
   input:
